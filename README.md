@@ -21,6 +21,7 @@ Read more about skills in the [Claude Code documentation](https://docs.claude.co
 | Skill | What it does | Status |
 |---|---|---|
 | [`knowledge-gap-analysis`](./knowledge-gap-analysis/) | End-to-end methodology for turning workforce assessment data (test results, competency surveys) into a prioritized training plan. Includes a 5-phase framework, a priority scoring formula, three-tier reporting hierarchy, and standalone Python scripts. | ✅ Stable |
+| [`poalim-presentation`](./poalim-presentation/) | Builds single-file HTML presentation decks in the Bank Hapoalim L&D visual language: Hebrew RTL, neon-red on dark, Heebo font, animated CSS/JS — no build step, no framework. Given a topic or brief, Claude interviews you, proposes a slide outline, implements the full deck, and generates a speaker-notes companion with thumbnails. Includes the full design system (tokens, layouts, component catalogue, animation rules) and hard-won rules about RTL alignment, headings, icons, and orphan prevention. | ✅ Stable |
 
 *More skills will be added over time. Check back periodically.*
 
