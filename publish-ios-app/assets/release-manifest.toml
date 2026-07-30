@@ -1,0 +1,65 @@
+schema_version = 1
+
+[app]
+name = "Example App"
+bundle_id = "com.example.app"
+platform = "ios"
+primary_locale = "en-US"
+supports_ipad = false
+
+[release]
+version = "1.0.0"
+build = "1"
+status = "draft"
+release_notes = "Describe user-visible changes."
+privacy_policy_url = "https://example.com/privacy"
+support_url = "https://example.com/support"
+category = "Choose in App Store Connect"
+content_rights = "unresolved"
+encryption = "unresolved"
+release_method = "manual"
+login_required = false
+review_notes_file = ".app-store/review-notes.md"
+review_contact_env_prefix = "ASC_REVIEW"
+
+[monetization]
+model = "free"
+first_subscription = false
+
+# For a subscription app, set model = "subscription" and add one or more
+# entries like this. Keep credentials and account identifiers out of this file.
+#
+# [[subscriptions]]
+# product_id = "com.example.app.monthly"
+# group_reference = "Example Premium"
+# period = "P1M"
+# price_note = "Select the intended storefront price in App Store Connect"
+# introductory_offer = "P3D_FREE"
+# entitlement = "premium"
+
+[artifacts]
+app_icon_1024 = "store-assets/app-icon-1024.png"
+screenshots_dir = "store-assets/screenshots"
+privacy_manifest = ""
+
+[gates]
+account_holder_confirmed = false
+legal_entity_verified = false
+agreements_active = false
+banking_complete = false
+tax_complete = false
+compliance_complete = false
+app_privacy_complete = false
+age_rating_complete = false
+content_rights_complete = false
+export_compliance_complete = false
+metadata_complete = false
+screenshots_complete = false
+review_information_complete = false
+products_ready = false
+build_uploaded = false
+testflight_passed = false
+physical_device_passed = false
+release_frozen = false
+submission_approved = false
+submitted = false
