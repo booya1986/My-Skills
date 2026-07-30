@@ -1,0 +1,4 @@
+interface:
+  display_name: "Publish iOS App"
+  short_description: "Audit, test, and submit iOS App Store releases"
+  default_prompt: "Use $publish-ios-app to audit this project and take its next iOS release through TestFlight and App Store submission."
