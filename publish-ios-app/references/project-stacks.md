@@ -80,3 +80,17 @@ For every stack:
 - inspect the archived `Info.plist`, entitlements, frameworks, privacy manifests, and icons;
 - ensure the archive version/build match the App Store Connect version record;
 - validate with the installed current Apple toolchain before upload.
+
+## Universal device regression
+
+Before freezing any first release or update:
+
+- install the exact candidate on a physical supported device;
+- cold-launch it and verify the root screen is interactive rather than blank;
+- for an update, install over realistic data from the previous public version and preserve user state;
+- exercise every control on the primary user journey, not only the first rendered screen;
+- verify packaged images, audio, video, fonts, localized resources, and offline fallbacks load from native paths;
+- test relaunch and interruption recovery;
+- inspect crashes, hangs, responsiveness, Reduce Motion, and accessibility behavior.
+
+Browser, simulator, and Debug evidence are useful but do not prove that the uploaded Release/TestFlight payload behaves the same way.

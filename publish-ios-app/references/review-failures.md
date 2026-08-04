@@ -15,6 +15,7 @@ Use this list immediately before freezing a release and when App Review reports 
 
 - Required screenshot set is missing, has an alpha channel, uses an unsupported size, or shows a materially different UI.
 - Privacy policy or support URL is missing, broken, gated, or unrelated to the app.
+- Terms of Use is absent from a submitted description localization, points to a broken URL, or conflicts with the configured EULA. For Apple Standard EULA, keep the functional standard-EULA link in the description; for a custom EULA, configure it in App Store Connect and keep user-facing Terms access consistent.
 - Description, screenshots, or age rating promise features not in the submitted build.
 - Content-rights or export-compliance answer is incomplete.
 - Review contact information is missing or unreachable.
@@ -25,7 +26,9 @@ Use this list immediately before freezing a release and when App Review reports 
 - Product identifier differs between code, App Store Connect, and the purchase platform.
 - Paid Apps Agreement, banking, tax, or compliance status blocks paid products.
 - Product localization, price, availability, review notes, or Review Information screenshot is incomplete.
-- First subscription or first subscription group is not attached to the new app-version submission.
+- A first-of-type In-App Purchase is not attached to a new app-version submission when required.
+- First auto-renewable subscription or first subscription group is not attached to the new app-version submission.
+- A non-consumable is described as auto-renewing, an app-managed free period is described as an App Store trial, or product type and offer copy disagree.
 - Paywall does not disclose price, renewal period, or trial terms clearly.
 - Restore Purchases or subscription management is absent or broken.
 - Entitlement unlock relies on a local flag instead of verified transaction/customer state.
@@ -34,6 +37,8 @@ Use this list immediately before freezing a release and when App Review reports 
 ## Functionality and policy
 
 - App crashes, hangs, presents an empty state, or requires unavailable backend/content.
+- An update launches with data from a fresh install but fails with persisted data from the previous public version.
+- The primary screen renders but required controls or packaged media are missing in the native archive.
 - Permissions are requested without clear purpose strings or before their need is explained.
 - External links, media, account deletion, or sign-in flows are incomplete.
 - App privacy answers do not include data collected by third-party SDKs.
@@ -51,10 +56,16 @@ Use this list immediately before freezing a release and when App Review reports 
 ## Response workflow
 
 1. Preserve Apple's exact message and guideline reference.
-2. Reproduce the issue on the submitted build when possible.
-3. Separate code, metadata, account, and reviewer-access causes.
-4. Fix the smallest root cause.
-5. Upload a new build when binary behavior changed.
-6. Update metadata only when the binary is already correct.
-7. Draft a factual response with reproduction steps and validation evidence.
-8. Obtain approval before sending the response or resubmitting.
+2. Record every affected item, but classify it before fixing anything:
+   - `root`: Apple identified a defect in this item;
+   - `collateral`: the item was returned only because the associated app/submission failed;
+   - `account`: agreement, tax, banking, identity, DSA, or compliance work;
+   - `external wait`: Apple is processing or verifying completed work.
+3. Reproduce the root issue on the submitted build when possible.
+4. Separate code, metadata, account, and reviewer-access causes.
+5. Fix the smallest root cause. Never create a duplicate product merely because a collateral item also shows `Rejected`.
+6. Upload a new build when binary behavior changed.
+7. Update metadata only when the binary is already correct.
+8. Draft a factual response with reproduction steps and validation evidence.
+9. Obtain approval before sending the response or resubmitting.
+10. Convert a broadly reusable lesson into a preflight gate; keep the app-specific chronology in its own release ledger.

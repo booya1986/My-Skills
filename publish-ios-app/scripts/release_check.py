@@ -26,6 +26,10 @@ DEFAULT_MANIFEST = Path(".app-store/release.toml")
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg"}
 PAID_MODELS = {"paid", "iap", "subscription"}
 VALID_MODELS = {"free", "paid", "iap", "subscription"}
+PRODUCT_MODELS = {"iap", "subscription"}
+VALID_IAP_TYPES = {"consumable", "non_consumable", "non_renewing_subscription"}
+VALID_EULA_MODES = {"apple-standard", "custom"}
+APPLE_STANDARD_EULA = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
 VALID_STATUSES = {
     "draft",
     "prepared",
@@ -118,6 +122,32 @@ def require_value(section: dict[str, Any], key: str, label: str, report: Report)
         report.ok(f"{label} is set.")
 
 
+def require_https_url(section: dict[str, Any], key: str, label: str, report: Report) -> str:
+    value = section.get(key)
+    require_value(section, key, label, report)
+    if not isinstance(value, str) or is_placeholder(value):
+        return ""
+    if not re.fullmatch(r"https://[^\s]+", value.strip(), flags=re.IGNORECASE):
+        report.blocker(f"{label} must be a complete HTTPS URL.")
+        return ""
+    report.ok(f"{label} uses HTTPS; live reachability still requires an external check.")
+    return value.strip()
+
+
+def require_project_file(
+    project: Path, section: dict[str, Any], key: str, label: str, report: Report
+) -> None:
+    value = section.get(key)
+    if not isinstance(value, str) or is_placeholder(value):
+        report.blocker(f"{label} is missing or still a placeholder.")
+        return
+    path = absolute(project, value)
+    if not path.is_file():
+        report.blocker(f"{label} not found at {path}.")
+    else:
+        report.ok(f"{label} exists.")
+
+
 def check_sensitive_text(raw: str, report: Report) -> None:
     checks = {
         "a local user-directory path": r"(?:/Users/[^/\s]+|[A-Za-z]:\\Users\\[^\\\s]+)",
@@ -190,13 +220,17 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
         discover_project(project, report)
         return report
 
-    if data.get("schema_version") != 1:
-        report.blocker("schema_version must be 1.")
+    if data.get("schema_version") != 2:
+        report.blocker(
+            "schema_version must be 2. Reconcile the project ledger with the current template; "
+            "do not overwrite verified release facts."
+        )
 
     app = table(data, "app", report)
     release = table(data, "release", report)
     monetization = table(data, "monetization", report)
     artifacts = table(data, "artifacts", report)
+    evidence = table(data, "evidence", report)
     gates = table(data, "gates", report)
 
     require_value(app, "name", "App name", report)
@@ -210,8 +244,23 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
     require_value(release, "version", "Marketing version", report)
     require_value(release, "build", "Build number", report)
     require_value(release, "release_notes", "Release notes", report)
-    require_value(release, "privacy_policy_url", "Privacy policy URL", report)
-    require_value(release, "support_url", "Support URL", report)
+    require_https_url(release, "privacy_policy_url", "Privacy policy URL", report)
+    require_https_url(release, "support_url", "Support URL", report)
+    terms_url = require_https_url(release, "terms_of_use_url", "Terms of Use URL", report)
+    eula_mode = release.get("eula_mode")
+    if eula_mode not in VALID_EULA_MODES:
+        report.blocker(
+            "release.eula_mode must be one of: " + ", ".join(sorted(VALID_EULA_MODES)) + "."
+        )
+    elif eula_mode == "apple-standard":
+        if terms_url != APPLE_STANDARD_EULA:
+            report.blocker(
+                "Apple Standard EULA mode requires the canonical Apple Standard EULA URL."
+            )
+        else:
+            report.ok("Apple Standard EULA URL matches the canonical URL.")
+    else:
+        report.ok("Custom EULA mode is recorded; App Store Connect configuration requires verification.")
     require_value(release, "category", "Primary category", report)
 
     status = release.get("status")
@@ -252,7 +301,10 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
         report.facts["monetization_model"] = model
 
     subscriptions = data.get("subscriptions", [])
+    in_app_purchases = data.get("in_app_purchases", [])
     if model == "subscription":
+        if not isinstance(monetization.get("first_subscription"), bool):
+            report.blocker("monetization.first_subscription must be true or false.")
         if not isinstance(subscriptions, list) or not subscriptions:
             report.blocker("Subscription monetization requires at least one [[subscriptions]] entry.")
         else:
@@ -270,9 +322,65 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
                 ):
                     if is_placeholder(subscription.get(key)):
                         report.blocker(f"Subscription {index} field '{key}' is missing or a placeholder.")
+                require_project_file(
+                    project,
+                    subscription,
+                    "review_screenshot",
+                    f"Subscription {index} review screenshot",
+                    report,
+                )
+                require_project_file(
+                    project,
+                    subscription,
+                    "review_notes_file",
+                    f"Subscription {index} review notes",
+                    report,
+                )
             report.facts["subscription_count"] = len(subscriptions)
     elif subscriptions:
         report.warning("Subscription entries exist but monetization.model is not 'subscription'.")
+
+    if model == "iap":
+        if not isinstance(in_app_purchases, list) or not in_app_purchases:
+            report.blocker("IAP monetization requires at least one [[in_app_purchases]] entry.")
+        else:
+            for index, product in enumerate(in_app_purchases, start=1):
+                if not isinstance(product, dict):
+                    report.blocker(f"In-App Purchase {index} is invalid.")
+                    continue
+                for key in ("product_id", "entitlement"):
+                    if is_placeholder(product.get(key)):
+                        report.blocker(
+                            f"In-App Purchase {index} field '{key}' is missing or a placeholder."
+                        )
+                product_type = product.get("type")
+                if product_type not in VALID_IAP_TYPES:
+                    report.blocker(
+                        f"In-App Purchase {index} type must be one of: "
+                        + ", ".join(sorted(VALID_IAP_TYPES))
+                        + "."
+                    )
+                if not isinstance(product.get("first_of_type"), bool):
+                    report.blocker(
+                        f"In-App Purchase {index} first_of_type must be true or false."
+                    )
+                require_project_file(
+                    project,
+                    product,
+                    "review_screenshot",
+                    f"In-App Purchase {index} review screenshot",
+                    report,
+                )
+                require_project_file(
+                    project,
+                    product,
+                    "review_notes_file",
+                    f"In-App Purchase {index} review notes",
+                    report,
+                )
+            report.facts["in_app_purchase_count"] = len(in_app_purchases)
+    elif in_app_purchases:
+        report.warning("In-App Purchase entries exist but monetization.model is not 'iap'.")
 
     icon_value = artifacts.get("app_icon_1024")
     if not isinstance(icon_value, str) or not icon_value:
@@ -329,17 +437,32 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
         "content_rights_complete",
         "export_compliance_complete",
         "metadata_complete",
+        "metadata_urls_live",
         "screenshots_complete",
         "review_information_complete",
         "build_uploaded",
         "testflight_passed",
         "physical_device_passed",
+        "cold_launch_passed",
+        "critical_path_passed",
+        "performance_passed",
         "release_frozen",
         "submission_approved",
     }
+    if eula_mode == "apple-standard":
+        required_gates.add("terms_link_in_description")
+    elif eula_mode == "custom":
+        required_gates.add("custom_eula_configured")
     if model in PAID_MODELS:
+        required_gates.update({"agreements_active", "banking_complete", "tax_complete"})
+    if model in PRODUCT_MODELS:
         required_gates.update(
-            {"agreements_active", "banking_complete", "tax_complete", "products_ready"}
+            {
+                "products_ready",
+                "iap_review_assets_complete",
+                "in_app_legal_links",
+                "monetization_copy_matches",
+            }
         )
 
     incomplete = sorted(key for key in required_gates if gates.get(key) is not True)
@@ -360,11 +483,37 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
     }:
         report.blocker("gates.submitted is true but release.status is not a post-submission status.")
 
+    if gates.get("build_uploaded") is True:
+        require_value(evidence, "uploaded_build_id", "Uploaded build evidence", report)
+
+    if gates.get("submitted") is True:
+        require_value(evidence, "submission_id", "Submission ID evidence", report)
+        checked_at = evidence.get("status_checked_at")
+        require_value(evidence, "status_checked_at", "Status verification time", report)
+        if isinstance(checked_at, str) and not is_placeholder(checked_at):
+            if not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?(?:Z|[+-]\d{2}:\d{2})", checked_at):
+                report.blocker("evidence.status_checked_at must be an ISO-8601 timestamp with timezone.")
+
     if gates.get("release_frozen") is True:
-        prerequisites = ("testflight_passed", "physical_device_passed", "build_uploaded")
+        prerequisites = (
+            "testflight_passed",
+            "physical_device_passed",
+            "cold_launch_passed",
+            "critical_path_passed",
+            "performance_passed",
+            "build_uploaded",
+        )
         missing = [key for key in prerequisites if gates.get(key) is not True]
         if missing:
             report.blocker("Release is frozen before required testing/upload gates: " + ", ".join(missing))
+        source_commit = evidence.get("source_commit")
+        if not isinstance(source_commit, str) or not re.fullmatch(r"[0-9a-fA-F]{7,64}", source_commit):
+            report.blocker("Frozen release requires evidence.source_commit as a Git commit hash.")
+        archive_sha256 = evidence.get("archive_sha256")
+        if not isinstance(archive_sha256, str) or not re.fullmatch(
+            r"[0-9a-fA-F]{64}", archive_sha256
+        ):
+            report.blocker("Frozen release requires evidence.archive_sha256 as 64 hex characters.")
 
     discover_project(project, report)
     return report

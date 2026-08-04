@@ -1,6 +1,6 @@
-# Subscriptions and Entitlements
+# Purchases, Subscriptions, and Entitlements
 
-Use this reference when the release includes auto-renewable subscriptions or another purchase platform.
+Use this reference when the release includes a paid app, In-App Purchase, auto-renewable subscription, or another purchase platform.
 
 ## Product model
 
@@ -16,6 +16,15 @@ Freeze these identifiers before implementation:
 
 Identifiers must match across App Store Connect, StoreKit code, purchase-platform configuration, tests, and review notes. Never reuse obsolete identifiers merely because they already exist.
 
+## Choose the exact product type
+
+- `consumable`: can be purchased repeatedly and is depleted by use;
+- `non-consumable`: one explicit purchase intended to remain unlocked;
+- `non-renewing subscription`: time-limited access without automatic renewal;
+- `auto-renewable subscription`: renews until cancelled and must provide ongoing value.
+
+Do not model a lifetime unlock as a subscription. Do not call an app-managed free-access period an App Store trial, and do not imply that it will convert automatically into a non-consumable purchase. Display the StoreKit-localized price and the actual renewal behavior.
+
 ## Native implementation
 
 For a new native implementation, prefer StoreKit 2:
@@ -26,7 +35,7 @@ For a new native implementation, prefer StoreKit 2:
 4. Finish verified transactions.
 5. Derive access from current verified entitlements.
 6. Observe transaction updates for changes made outside the current session.
-7. Provide Restore Purchases and subscription-management entry points.
+7. Provide Restore Purchases. Provide subscription management only for an actual subscription.
 8. Handle pending, user-cancelled, unverified, expired, revoked, grace-period, and billing-retry states.
 
 Do not grant premium access solely from a local boolean or from a purchase sheet returning success.
@@ -62,9 +71,9 @@ Never hardcode a currency-formatted price as the purchase source of truth.
 
 ## First-subscription rule
 
-The first auto-renewable subscription and its first subscription group must be submitted with a new app version in the same review submission. Add the subscription product for review, attach it to the version submission, and include its Review Information screenshot.
+Apple's current submission rules require the first consumable, first non-consumable, first non-renewing subscription, and first auto-renewable subscription of their respective types to be submitted with a new app version. A first auto-renewable subscription also needs its subscription group in the same review submission. Add the product for review, attach the required items to the version submission, and include Review Information.
 
-After the first subscription is approved, later subscription products may follow Apple's current standalone submission rules.
+After the first item of a type is approved, later items of that type may follow Apple's current standalone submission rules. Re-check the official rule for every release.
 
 ## Test matrix
 
@@ -82,6 +91,8 @@ Test at minimum:
 - app relaunch refreshes entitlement;
 - sandbox account with prior introductory use is not shown as eligible.
 
+For consumables and non-consumables, replace subscription-only cases with the matching lifecycle: repeated purchase/depletion for consumables; reinstall, restore, refund/revocation, and no-renewal copy for non-consumables.
+
 Record the environment and build number, but never record sandbox credentials in the repository.
 
 ## Review information
@@ -93,3 +104,5 @@ Provide a screenshot showing where the purchase begins inside the app. In review
 - explain any login requirement;
 - clarify external hardware, location, account, or content dependencies;
 - provide demo credentials through the secure App Store Connect field, not source control.
+
+Every paid-product screen must expose functional Terms and Privacy links. If the app uses Apple Standard EULA, keep its functional link in every submitted App Description localization. If it uses a custom EULA, configure the custom agreement in App Store Connect and keep the app, metadata, and review notes consistent.
