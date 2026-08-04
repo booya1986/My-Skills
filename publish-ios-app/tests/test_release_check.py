@@ -64,6 +64,9 @@ class ReleaseCheckTests(unittest.TestCase):
             'source_commit = ""': f'source_commit = "{"a" * 40}"',
             'archive_sha256 = ""': f'archive_sha256 = "{"b" * 64}"',
             'uploaded_build_id = ""': 'uploaded_build_id = "build-42"',
+            'uploaded_build_number = ""': 'uploaded_build_number = "1"',
+            'testflight_tested_build = ""': 'testflight_tested_build = "1"',
+            'device_tested_build = ""': 'device_tested_build = "1"',
         }
         for old, new in replacements.items():
             template = template.replace(old, new)
@@ -80,6 +83,9 @@ class ReleaseCheckTests(unittest.TestCase):
             "terms_link_in_description",
             "screenshots_complete",
             "review_information_complete",
+            "native_payload_verified",
+            "store_assets_match_build",
+            "release_surfaces_match",
             "build_uploaded",
             "testflight_passed",
             "physical_device_passed",
@@ -155,6 +161,19 @@ review_notes_file = ".app-store/iap-notes.md"
             text = text.replace(f"{gate} = false", f"{gate} = true")
         report = self.validate(text)
         self.assertEqual([], report.blockers)
+
+    def test_completed_test_gate_requires_the_same_release_build(self) -> None:
+        text = self.manifest_text().replace(
+            'device_tested_build = "1"', 'device_tested_build = "2"'
+        )
+        report = self.validate(text)
+        self.assertTrue(
+            any(
+                "Physical-device-tested build evidence (2) does not match release.build (1)"
+                in item
+                for item in report.blockers
+            )
+        )
 
 
 if __name__ == "__main__":

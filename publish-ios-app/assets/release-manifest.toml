@@ -1,4 +1,4 @@
-schema_version = 2
+schema_version = 3
 
 [app]
 name = "Example App"
@@ -62,6 +62,9 @@ privacy_manifest = ""
 source_commit = ""
 archive_sha256 = ""
 uploaded_build_id = ""
+uploaded_build_number = ""
+testflight_tested_build = ""
+device_tested_build = ""
 submission_id = ""
 status_checked_at = ""
 
@@ -86,6 +89,9 @@ products_ready = false
 iap_review_assets_complete = false
 in_app_legal_links = false
 monetization_copy_matches = false
+native_payload_verified = false
+store_assets_match_build = false
+release_surfaces_match = false
 build_uploaded = false
 testflight_passed = false
 physical_device_passed = false

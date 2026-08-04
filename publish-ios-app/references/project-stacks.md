@@ -32,10 +32,11 @@ Signals:
 Actions:
 
 1. Run the project's package-manager checks and production web build.
-2. Run the project's Capacitor sync command for iOS.
-3. Inspect native diffs created by the sync.
-4. Build and test the Xcode workspace/project in `ios/`.
-5. Verify native plugins, URL schemes, permissions, privacy manifests, and icons.
+2. Stop the development server, hot reload, and file watchers before the final sync.
+3. Run the project's Capacitor sync command for iOS exactly once from the frozen source state.
+4. Inspect native diffs and generated output for numbered duplicates, stale routes/assets, and the intended native entry point.
+5. Build and test the Xcode workspace/project in `ios/`.
+6. Verify native plugins, URL schemes, permissions, privacy manifests, and icons.
 
 Never archive stale web assets. The commit, web build, synced native assets, archive, and uploaded build must represent the same source state.
 
@@ -80,12 +81,13 @@ For every stack:
 - inspect the archived `Info.plist`, entitlements, frameworks, privacy manifests, and icons;
 - ensure the archive version/build match the App Store Connect version record;
 - validate with the installed current Apple toolchain before upload.
+- record the Apple build number used by upload, TestFlight, and physical-device validation and require it to match the release ledger.
 
 ## Universal device regression
 
 Before freezing any first release or update:
 
-- install the exact candidate on a physical supported device;
+- install the exact candidate on a physical supported device and record its build number;
 - cold-launch it and verify the root screen is interactive rather than blank;
 - for an update, install over realistic data from the previous public version and preserve user state;
 - exercise every control on the primary user journey, not only the first rendered screen;
@@ -94,3 +96,4 @@ Before freezing any first release or update:
 - inspect crashes, hangs, responsiveness, Reduce Motion, and accessibility behavior.
 
 Browser, simulator, and Debug evidence are useful but do not prove that the uploaded Release/TestFlight payload behaves the same way.
+Installation evidence alone is also insufficient: if the device was locked or the launch was not observed, record only `installed` and leave the physical-device gate incomplete.

@@ -21,6 +21,8 @@ Take any existing iOS-capable project from its current state to a verified App S
 10. Never report success from a clicked button alone. Re-read the resulting status and record evidence.
 11. Treat every Apple message as evidence, not as a diagnosis: separate the root issue from items returned only because their parent app version was rejected.
 12. Maintain one evolving pipeline. Add a reusable gate after a review or delivery failure only when it generalizes; keep app-specific history in that app's release ledger or canonical release document.
+13. Bind every pass to one release identity: source commit, version, build, product set, metadata, and store assets. Never merge evidence from different release tracks.
+14. Use precise delivery language. Built, archived, uploaded, processed, selected, installed, launched, submitted, approved, and released are different states.
 
 ## Select an operating mode
 
@@ -65,6 +67,8 @@ For every invocation:
 5. Execute only the first incomplete dependency chain. Do not recreate products, metadata, screenshots, submissions, or documents that already exist and still match.
 6. Classify results as `blocker`, `warning`, `external wait`, or `verified` so Apple processing is not mistaken for unfinished implementation.
 
+Read [release-evidence.md](references/release-evidence.md) when the project has multiple versions in flight, when resuming prior work, and before reusing any device, TestFlight, screenshot, or submission evidence.
+
 ## Workflow
 
 ### 1. Inspect before changing anything
@@ -74,7 +78,8 @@ For every invocation:
 3. Detect the stack, Xcode project/workspace, schemes, bundle identifier, deployment target, version, build number, entitlements, privacy manifest, app icon set, StoreKit dependencies, and CI/release tooling.
 4. Inspect existing App Store Connect state through the API when available. Use the browser for unsupported screens and user-facing legal flows.
 5. Compare repository state, the release ledger, the uploaded build, and the App Store version record.
-6. Return blockers grouped as `code`, `assets`, `metadata`, `monetization`, `account`, `testing`, or `review`.
+6. Build a compact release-identity table for every active track and channel. At minimum include source commit, version, build, selected product set, tested channel, and live Apple status.
+7. Return blockers grouped as `code`, `assets`, `metadata`, `monetization`, `account`, `testing`, or `review`.
 
 Read [project-stacks.md](references/project-stacks.md) when identifying or building a non-native stack.
 
@@ -119,8 +124,10 @@ Read [subscriptions.md](references/subscriptions.md) for purchase, subscription,
 3. Build the Release configuration with the intended scheme and destination.
 4. Verify bundle identifier, version, build, signing team selection, entitlements, minimum OS, orientations, privacy manifest, and icon in the archived app.
 5. Ensure the archive contains no development-only menus, placeholder data, demo products, debug endpoints, or test credentials.
-6. Validate the archive with current Apple tooling before upload.
-7. Record the source commit and archive fingerprint. Rebuild if the archived native payload does not match the source and synchronized assets that passed checks.
+6. Before the final native generation or sync, stop development servers and watchers, generate once from the frozen source, and inspect for numbered duplicates, stale resources, a wrong entry point, or development-server dependencies.
+7. Validate the archive with current Apple tooling before upload.
+8. Record the source commit and archive fingerprint. Rebuild if the archived native payload does not match the source and synchronized assets that passed checks.
+9. Set `native_payload_verified` only after a project-appropriate payload inventory or hash proves that the archived app contains the intended edition and packaged assets.
 
 Do not repair signing by replacing certificates or deleting profiles unless the exact target is known and the user authorized it.
 
@@ -133,7 +140,9 @@ Do not repair signing by replacing certificates or deleting profiles unless the 
 5. Test a fresh install and an upgrade over realistic data from the previous public version. Include cold launch, onboarding, permissions, offline/error behavior, the primary journey, every critical control, packaged media/assets, purchase, trial or free-access copy, restore, entitlement refresh, external links, and relaunch.
 6. Review crash, hang, and console evidence.
 7. Check perceived smoothness, hangs, long tasks, Reduce Motion behavior, and accessibility on the critical path.
-8. Record the tested build number and set `testflight_passed`, `physical_device_passed`, `cold_launch_passed`, `critical_path_passed`, and `performance_passed` only after real success.
+8. Record the uploaded, TestFlight-tested, and physical-device-tested build numbers. They must equal `release.build`.
+9. Set `physical_device_passed` only after the exact candidate was installed, launched past the root screen, and exercised; installation alone is not a pass.
+10. Set `testflight_passed`, `physical_device_passed`, `cold_launch_passed`, `critical_path_passed`, and `performance_passed` only after real success.
 
 External TestFlight testers may require Beta App Review. Do not confuse Beta App Review with App Review.
 
@@ -148,6 +157,7 @@ Verify all of the following:
 - the Privacy, Terms, and Support URLs were opened successfully during this release;
 - paid-product screens expose working Terms and Privacy links; auto-renewable subscriptions meet Apple's current in-app disclosure requirements;
 - screenshots meet Apple's current specification, show the real app, contain no alpha, and match supported devices;
+- screenshots and IAP Review Information assets depict the selected build and current product model rather than an older or future release;
 - the 1024×1024 App Store icon is present and opaque;
 - age rating, app privacy, content rights, encryption/export compliance, and availability are complete;
 - Review Information includes a reachable contact through environment-held values, accurate notes, and valid demo access when login is required;
@@ -155,6 +165,8 @@ Verify all of the following:
 - first-of-type In-App Purchases and the first subscription/group are included with the new app version when applicable;
 - product type, localized StoreKit price, trial/free-access language, renewal behavior, entitlement, app UI, description, screenshot, and Review Notes all describe the same offer;
 - agreements and finance gates are active or in an Apple-confirmed acceptable state.
+
+Set `store_assets_match_build` and `release_surfaces_match` only after the selected binary, metadata, privacy answers, screenshots, paid products, and review notes describe the same release.
 
 Read [review-failures.md](references/review-failures.md) before declaring readiness.
 
@@ -222,6 +234,7 @@ If Apple is processing or reviewing, report the release as submitted and waiting
 - [subscriptions.md](references/subscriptions.md): product types, StoreKit, purchase platforms, trials/free access, entitlements, and first-of-type submission.
 - [project-stacks.md](references/project-stacks.md): native, Capacitor, React Native, and Flutter release preparation.
 - [review-failures.md](references/review-failures.md): common preflight and App Review failures.
+- [release-evidence.md](references/release-evidence.md): release-track identity, proof levels, invalidation, asset reuse, and native packaging hygiene.
 - [official-sources.md](references/official-sources.md): current Apple documentation entry points.
 - `assets/release-manifest.toml`: generic release-ledger template.
 - `scripts/release_check.py`: initialize and validate project release state without sending data anywhere.

@@ -8,12 +8,15 @@ Use this list immediately before freezing a release and when App Review reports 
 - Version or build number duplicates an uploaded build or does not match the selected version.
 - Wrong scheme, target, configuration, signing team, capability, or provisioning profile.
 - Archive contains debug endpoints, a development server dependency, placeholder products, or demo menus.
+- Hybrid native payload contains the web/marketing edition, a stale route, or the wrong generated entry point.
+- A running watcher or repeated sync created numbered duplicate output, stale assets, or mixed resources from different source states.
 - Required privacy manifest or SDK signature is missing.
 - App icon is missing, transparent, incorrectly sized, or absent from the archive.
 
 ## Metadata and assets
 
 - Required screenshot set is missing, has an alpha channel, uses an unsupported size, or shows a materially different UI.
+- Screenshots or paid-product Review Information depict a previous build, obsolete product model, or future feature not present in the selected binary.
 - Privacy policy or support URL is missing, broken, gated, or unrelated to the app.
 - Terms of Use is absent from a submitted description localization, points to a broken URL, or conflicts with the configured EULA. For Apple Standard EULA, keep the functional standard-EULA link in the description; for a custom EULA, configure it in App Store Connect and keep user-facing Terms access consistent.
 - Description, screenshots, or age rating promise features not in the submitted build.
@@ -37,6 +40,7 @@ Use this list immediately before freezing a release and when App Review reports 
 ## Functionality and policy
 
 - App crashes, hangs, presents an empty state, or requires unavailable backend/content.
+- The candidate was installed but never successfully launched and exercised on the device used as release evidence.
 - An update launches with data from a fresh install but fails with persisted data from the previous public version.
 - The primary screen renders but required controls or packaged media are missing in the native archive.
 - Permissions are requested without clear purpose strings or before their need is explained.
@@ -49,6 +53,8 @@ Use this list immediately before freezing a release and when App Review reports 
 
 - `Ready for Review` means the item is in a draft submission, not sent to App Review.
 - Build processing is not the same as TestFlight availability.
+- A locally installed Debug build is not evidence that the uploaded/TestFlight build passed.
+- `Installed` does not mean `launched`, and `launched` does not mean the critical path passed.
 - TestFlight Beta App Review is not production App Review.
 - `Waiting for Review` means Apple received the submission but has not started review.
 - A version cannot be called published until its release status confirms availability on the App Store.

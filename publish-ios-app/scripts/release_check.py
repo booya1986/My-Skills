@@ -148,6 +148,21 @@ def require_project_file(
         report.ok(f"{label} exists.")
 
 
+def require_matching_build(
+    evidence: dict[str, Any], key: str, label: str, release_build: Any, report: Report
+) -> None:
+    value = evidence.get(key)
+    if value is None or is_placeholder(value):
+        report.blocker(f"{label} is missing or still a placeholder.")
+        return
+    if str(value) != str(release_build):
+        report.blocker(
+            f"{label} ({value}) does not match release.build ({release_build})."
+        )
+    else:
+        report.ok(f"{label} matches release.build.")
+
+
 def check_sensitive_text(raw: str, report: Report) -> None:
     checks = {
         "a local user-directory path": r"(?:/Users/[^/\s]+|[A-Za-z]:\\Users\\[^\\\s]+)",
@@ -220,9 +235,9 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
         discover_project(project, report)
         return report
 
-    if data.get("schema_version") != 2:
+    if data.get("schema_version") != 3:
         report.blocker(
-            "schema_version must be 2. Reconcile the project ledger with the current template; "
+            "schema_version must be 3. Reconcile the project ledger with the current template; "
             "do not overwrite verified release facts."
         )
 
@@ -440,6 +455,9 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
         "metadata_urls_live",
         "screenshots_complete",
         "review_information_complete",
+        "native_payload_verified",
+        "store_assets_match_build",
+        "release_surfaces_match",
         "build_uploaded",
         "testflight_passed",
         "physical_device_passed",
@@ -485,6 +503,31 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
 
     if gates.get("build_uploaded") is True:
         require_value(evidence, "uploaded_build_id", "Uploaded build evidence", report)
+        require_matching_build(
+            evidence,
+            "uploaded_build_number",
+            "Uploaded build number evidence",
+            release.get("build"),
+            report,
+        )
+
+    if gates.get("testflight_passed") is True:
+        require_matching_build(
+            evidence,
+            "testflight_tested_build",
+            "TestFlight-tested build evidence",
+            release.get("build"),
+            report,
+        )
+
+    if gates.get("physical_device_passed") is True:
+        require_matching_build(
+            evidence,
+            "device_tested_build",
+            "Physical-device-tested build evidence",
+            release.get("build"),
+            report,
+        )
 
     if gates.get("submitted") is True:
         require_value(evidence, "submission_id", "Submission ID evidence", report)
@@ -502,6 +545,9 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
             "critical_path_passed",
             "performance_passed",
             "build_uploaded",
+            "native_payload_verified",
+            "store_assets_match_build",
+            "release_surfaces_match",
         )
         missing = [key for key in prerequisites if gates.get(key) is not True]
         if missing:
