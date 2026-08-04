@@ -42,7 +42,7 @@ If the user did not specify a mode, inspect the repository and current App Store
 From the app repository root:
 
 ```bash
-python3 <skill-dir>/scripts/release_check.py check --project .
+python3 <skill-dir>/scripts/release_check.py plan --project .
 ```
 
 If `.app-store/release.toml` is missing:
@@ -54,7 +54,7 @@ If `.app-store/release.toml` is missing:
 python3 <skill-dir>/scripts/release_check.py init --project .
 ```
 
-Replace every placeholder with project-specific values, but keep personal and secret values in environment variables. Re-run `check` after each phase and `check --strict` before submission.
+`init` conservatively fills a unique app name, bundle identifier, version, and build discovered from the project and creates a reusable Review Notes draft. Replace remaining placeholders, but keep personal and secret values in environment variables. Re-run `plan` after a phase, `check` for a full audit, and `check --strict` before submission.
 
 ## Run the shortest safe path
 
@@ -66,6 +66,15 @@ For every invocation:
 4. Invalidate downstream evidence when code, native assets, product type, entitlement, privacy behavior, screenshots, legal copy, or selected build changes.
 5. Execute only the first incomplete dependency chain. Do not recreate products, metadata, screenshots, submissions, or documents that already exist and still match.
 6. Classify results as `blocker`, `warning`, `external wait`, or `verified` so Apple processing is not mistaken for unfinished implementation.
+7. Use `release_check.py plan` as the compact default. It returns the current phase, owner, next gates, and queued phases instead of flooding the session with every passed check.
+
+Run independent work in three lanes after the first audit:
+
+- `account`: front-load agreements, tax/bank/compliance, product creation, and Apple processing waits;
+- `candidate`: code, native packaging, archive, TestFlight, and device verification;
+- `store package`: metadata, legal links, privacy, screenshots, Review Notes, and IAP review assets.
+
+Join the lanes only at release-surface consistency and freeze. While Apple processes one lane, continue safe work in the others. Batch all known account-holder fields or approvals into one concise handoff per phase, then verify all resulting statuses in one pass.
 
 Read [release-evidence.md](references/release-evidence.md) when the project has multiple versions in flight, when resuming prior work, and before reusing any device, TestFlight, screenshot, or submission evidence.
 
@@ -79,7 +88,7 @@ Read [release-evidence.md](references/release-evidence.md) when the project has 
 4. Inspect existing App Store Connect state through the API when available. Use the browser for unsupported screens and user-facing legal flows.
 5. Compare repository state, the release ledger, the uploaded build, and the App Store version record.
 6. Build a compact release-identity table for every active track and channel. At minimum include source commit, version, build, selected product set, tested channel, and live Apple status.
-7. Return blockers grouped as `code`, `assets`, `metadata`, `monetization`, `account`, `testing`, or `review`.
+7. Return the single current phase first, then blockers grouped as `code`, `assets`, `metadata`, `monetization`, `account`, `testing`, or `review`.
 
 Read [project-stacks.md](references/project-stacks.md) when identifying or building a non-native stack.
 
@@ -180,7 +189,7 @@ python3 <skill-dir>/scripts/release_check.py check --project . --strict
 ```
 
 3. Present the user with the exact version, build, app, monetization items, release method, and remaining warnings.
-4. Obtain explicit approval for the final submission.
+4. Obtain one explicit approval packet covering the clearly enumerated final actions. Keep legal attestations with the account holder and request a new approval only if scope changes.
 5. Record `submission_approved = true`.
 6. Add the app version and all required in-app purchase items for review.
 7. Submit the assembled review submission.
@@ -214,6 +223,7 @@ When Apple requests information, quote or summarize the exact issue, map it to t
 - Use Xcode/Transporter for binary upload according to the installed toolchain and current Apple guidance.
 - Use browser automation for pages without reliable API coverage, especially agreements, banking, tax, legal entity, content-rights, and interactive review forms.
 - Keep the browser focused on the one page requiring user input; close unrelated tabs only when the user asks.
+- Group browser-only user actions into one bounded session; do not alternate repeatedly between local checks and one-field browser prompts.
 - Ask before any destructive signing, certificate, submission, pricing, availability, or live-release action.
 
 ## Completion criteria

@@ -25,7 +25,7 @@ review_notes_file = ".app-store/review-notes.md"
 review_contact_env_prefix = "ASC_REVIEW"
 
 [monetization]
-model = "free"
+model = "unresolved"
 first_subscription = false
 
 # For an In-App Purchase app, set model = "iap" and add one or more entries.

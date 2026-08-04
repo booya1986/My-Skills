@@ -9,6 +9,11 @@ import unittest
 from unittest.mock import patch
 import zlib
 
+try:
+    import tomllib
+except ModuleNotFoundError:
+    tomllib = None
+
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "release_check.py"
 SPEC = importlib.util.spec_from_file_location("release_check", SCRIPT)
@@ -45,6 +50,9 @@ class ReleaseCheckTests(unittest.TestCase):
         (self.project / "store-assets" / "screenshots" / "home.png").write_bytes(
             png_bytes(100, 200)
         )
+        (self.project / ".app-store" / "review-notes.md").write_text(
+            "Review the primary path.", encoding="utf-8"
+        )
 
     def tearDown(self) -> None:
         self.temp.cleanup()
@@ -61,6 +69,7 @@ class ReleaseCheckTests(unittest.TestCase):
             'content_rights = "unresolved"': 'content_rights = "confirmed-by-owner"',
             'encryption = "unresolved"': 'encryption = "confirmed-by-owner"',
             'status = "draft"': 'status = "ready"',
+            'model = "unresolved"': 'model = "free"',
             'source_commit = ""': f'source_commit = "{"a" * 40}"',
             'archive_sha256 = ""': f'archive_sha256 = "{"b" * 64}"',
             'uploaded_build_id = ""': 'uploaded_build_id = "build-42"',
@@ -174,6 +183,49 @@ review_notes_file = ".app-store/iap-notes.md"
                 for item in report.blockers
             )
         )
+
+    def test_plan_returns_only_the_first_incomplete_phase(self) -> None:
+        text = self.manifest_text().replace(
+            "metadata_complete = true", "metadata_complete = false"
+        )
+        manifest = self.project / ".app-store" / "release.toml"
+        manifest.write_text(text, encoding="utf-8")
+        data = tomllib.loads(text)
+        plan = release_check.build_release_plan(
+            data["gates"], data["monetization"]["model"], data["release"]["eula_mode"]
+        )
+        self.assertEqual("metadata", plan["current_phase"])
+        self.assertEqual(
+            [{"gate": "metadata_complete", "owner": "agent"}], plan["next_gates"]
+        )
+        self.assertEqual(["submission"], plan["queued_phases"])
+
+    def test_init_autofills_unique_xcode_identity_and_review_notes(self) -> None:
+        project = self.project / "Sample Product"
+        pbxproj = project / "Sample.xcodeproj" / "project.pbxproj"
+        pbxproj.parent.mkdir(parents=True)
+        pbxproj.write_text(
+            "\n".join(
+                (
+                    "PRODUCT_BUNDLE_IDENTIFIER = com.acme.sample;",
+                    "MARKETING_VERSION = 2.4;",
+                    "CURRENT_PROJECT_VERSION = 17;",
+                )
+            ),
+            encoding="utf-8",
+        )
+        (project / "capacitor.config.ts").write_text(
+            "export default { appId: 'com.acme.sample', appName: 'Sample Mobile' };",
+            encoding="utf-8",
+        )
+        manifest = project / ".app-store" / "release.toml"
+        self.assertEqual(0, release_check.init_manifest(project, manifest))
+        data = tomllib.loads(manifest.read_text(encoding="utf-8"))
+        self.assertEqual("Sample Mobile", data["app"]["name"])
+        self.assertEqual("com.acme.sample", data["app"]["bundle_id"])
+        self.assertEqual("2.4", data["release"]["version"])
+        self.assertEqual("17", data["release"]["build"])
+        self.assertTrue((project / ".app-store" / "review-notes.md").is_file())
 
 
 if __name__ == "__main__":

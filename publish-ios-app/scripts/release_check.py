@@ -22,6 +22,7 @@ except ModuleNotFoundError:
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE = SKILL_DIR / "assets" / "release-manifest.toml"
+REVIEW_NOTES_TEMPLATE = SKILL_DIR / "assets" / "review-notes-template.md"
 DEFAULT_MANIFEST = Path(".app-store/release.toml")
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg"}
 PAID_MODELS = {"paid", "iap", "subscription"}
@@ -41,6 +42,70 @@ VALID_STATUSES = {
     "approved",
     "released",
     "rejected",
+}
+
+GATE_PHASES = (
+    (
+        "account",
+        ("account_holder_confirmed", "legal_entity_verified", "compliance_complete"),
+    ),
+    ("commercial-account", ("agreements_active", "banking_complete", "tax_complete")),
+    (
+        "app-record",
+        (
+            "app_privacy_complete",
+            "age_rating_complete",
+            "content_rights_complete",
+            "export_compliance_complete",
+        ),
+    ),
+    (
+        "monetization",
+        (
+            "products_ready",
+            "iap_review_assets_complete",
+            "in_app_legal_links",
+            "monetization_copy_matches",
+        ),
+    ),
+    (
+        "metadata",
+        (
+            "metadata_complete",
+            "metadata_urls_live",
+            "terms_link_in_description",
+            "custom_eula_configured",
+            "screenshots_complete",
+            "review_information_complete",
+        ),
+    ),
+    ("candidate", ("native_payload_verified", "build_uploaded")),
+    (
+        "testflight-device",
+        (
+            "testflight_passed",
+            "physical_device_passed",
+            "cold_launch_passed",
+            "critical_path_passed",
+            "performance_passed",
+        ),
+    ),
+    ("consistency", ("store_assets_match_build", "release_surfaces_match")),
+    ("freeze", ("release_frozen",)),
+    ("approval", ("submission_approved",)),
+    ("submission", ("submitted",)),
+)
+
+ACCOUNT_HOLDER_GATES = {
+    "account_holder_confirmed",
+    "legal_entity_verified",
+    "agreements_active",
+    "banking_complete",
+    "tax_complete",
+    "compliance_complete",
+    "content_rights_complete",
+    "export_compliance_complete",
+    "submission_approved",
 }
 
 
@@ -163,6 +228,137 @@ def require_matching_build(
         report.ok(f"{label} matches release.build.")
 
 
+def required_release_gates(model: Any, eula_mode: Any) -> set[str]:
+    required = {
+        "account_holder_confirmed",
+        "legal_entity_verified",
+        "compliance_complete",
+        "app_privacy_complete",
+        "age_rating_complete",
+        "content_rights_complete",
+        "export_compliance_complete",
+        "metadata_complete",
+        "metadata_urls_live",
+        "screenshots_complete",
+        "review_information_complete",
+        "native_payload_verified",
+        "store_assets_match_build",
+        "release_surfaces_match",
+        "build_uploaded",
+        "testflight_passed",
+        "physical_device_passed",
+        "cold_launch_passed",
+        "critical_path_passed",
+        "performance_passed",
+        "release_frozen",
+        "submission_approved",
+    }
+    if eula_mode == "apple-standard":
+        required.add("terms_link_in_description")
+    elif eula_mode == "custom":
+        required.add("custom_eula_configured")
+    if model in PAID_MODELS:
+        required.update({"agreements_active", "banking_complete", "tax_complete"})
+    if model in PRODUCT_MODELS:
+        required.update(
+            {
+                "products_ready",
+                "iap_review_assets_complete",
+                "in_app_legal_links",
+                "monetization_copy_matches",
+            }
+        )
+    return required
+
+
+def build_release_plan(
+    gates: dict[str, Any], model: Any, eula_mode: Any
+) -> dict[str, Any]:
+    required = required_release_gates(model, eula_mode) | {"submitted"}
+    queue: list[dict[str, Any]] = []
+    for phase, phase_gates in GATE_PHASES:
+        pending = [gate for gate in phase_gates if gate in required and gates.get(gate) is not True]
+        if pending:
+            queue.append(
+                {
+                    "phase": phase,
+                    "gates": [
+                        {
+                            "gate": gate,
+                            "owner": "account-holder" if gate in ACCOUNT_HOLDER_GATES else "agent",
+                        }
+                        for gate in pending
+                    ],
+                }
+            )
+    return {
+        "complete": not queue,
+        "current_phase": queue[0]["phase"] if queue else None,
+        "next_gates": queue[0]["gates"] if queue else [],
+        "queued_phases": [entry["phase"] for entry in queue[1:]],
+        "remaining_gate_count": sum(len(entry["gates"]) for entry in queue),
+    }
+
+
+def unique_project_values(project: Path, setting: str) -> set[str]:
+    values: set[str] = set()
+    excluded = {".git", "node_modules", "Pods", "DerivedData", "build", ".dart_tool"}
+    pattern = re.compile(rf"\b{re.escape(setting)}\s*=\s*([^;]+);")
+    for path in project.rglob("project.pbxproj"):
+        if any(part in excluded for part in path.parts):
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        for match in pattern.finditer(text):
+            value = match.group(1).strip().strip('"')
+            if value and "$" not in value and not is_placeholder(value):
+                values.add(value)
+    return values
+
+
+def unique_config_values(project: Path, key: str) -> set[str]:
+    values: set[str] = set()
+    excluded = {".git", "node_modules", "Pods", "DerivedData", "build", ".dart_tool"}
+    pattern = re.compile(rf"(?:['\"]{re.escape(key)}['\"]|\b{re.escape(key)})\s*:\s*['\"]([^'\"]+)['\"]")
+    for path in project.rglob("capacitor.config.*"):
+        if any(part in excluded for part in path.parts):
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        values.update(match.group(1).strip() for match in pattern.finditer(text))
+    return {value for value in values if value and not is_placeholder(value)}
+
+
+def discover_release_defaults(project: Path) -> dict[str, str]:
+    defaults: dict[str, str] = {}
+    app_names = unique_config_values(project, "appName")
+    if len(app_names) == 1:
+        defaults["name"] = next(iter(app_names))
+    else:
+        xcode_names = {
+            path.stem
+            for path in project.rglob("*.xcodeproj")
+            if path.stem not in {"App", "Runner", "Pods"}
+        }
+        defaults["name"] = next(iter(xcode_names)) if len(xcode_names) == 1 else project.name
+
+    bundle_ids = unique_project_values(project, "PRODUCT_BUNDLE_IDENTIFIER")
+    bundle_ids.update(unique_config_values(project, "appId"))
+    candidates = {
+        "bundle_id": bundle_ids,
+        "version": unique_project_values(project, "MARKETING_VERSION"),
+        "build": unique_project_values(project, "CURRENT_PROJECT_VERSION"),
+    }
+    for key, values in candidates.items():
+        if len(values) == 1:
+            defaults[key] = next(iter(values))
+    return defaults
+
+
 def check_sensitive_text(raw: str, report: Report) -> None:
     checks = {
         "a local user-directory path": r"(?:/Users/[^/\s]+|[A-Za-z]:\\Users\\[^\\\s]+)",
@@ -277,6 +473,13 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
     else:
         report.ok("Custom EULA mode is recorded; App Store Connect configuration requires verification.")
     require_value(release, "category", "Primary category", report)
+    require_project_file(
+        project,
+        release,
+        "review_notes_file",
+        "App Review notes",
+        report,
+    )
 
     status = release.get("status")
     if status not in VALID_STATUSES:
@@ -443,48 +646,18 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
     else:
         report.ok(f"Found {screenshot_count} screenshot file(s); verify current Apple dimensions separately.")
 
-    required_gates = {
-        "account_holder_confirmed",
-        "legal_entity_verified",
-        "compliance_complete",
-        "app_privacy_complete",
-        "age_rating_complete",
-        "content_rights_complete",
-        "export_compliance_complete",
-        "metadata_complete",
-        "metadata_urls_live",
-        "screenshots_complete",
-        "review_information_complete",
-        "native_payload_verified",
-        "store_assets_match_build",
-        "release_surfaces_match",
-        "build_uploaded",
-        "testflight_passed",
-        "physical_device_passed",
-        "cold_launch_passed",
-        "critical_path_passed",
-        "performance_passed",
-        "release_frozen",
-        "submission_approved",
-    }
-    if eula_mode == "apple-standard":
-        required_gates.add("terms_link_in_description")
-    elif eula_mode == "custom":
-        required_gates.add("custom_eula_configured")
-    if model in PAID_MODELS:
-        required_gates.update({"agreements_active", "banking_complete", "tax_complete"})
-    if model in PRODUCT_MODELS:
-        required_gates.update(
-            {
-                "products_ready",
-                "iap_review_assets_complete",
-                "in_app_legal_links",
-                "monetization_copy_matches",
-            }
-        )
+    required_gates = required_release_gates(model, eula_mode)
 
     incomplete = sorted(key for key in required_gates if gates.get(key) is not True)
     report.facts["incomplete_gates"] = incomplete
+    report.facts["release_identity"] = {
+        "app": app.get("name"),
+        "bundle_id": app.get("bundle_id"),
+        "version": release.get("version"),
+        "build": release.get("build"),
+        "status": status,
+    }
+    report.facts["release_plan"] = build_release_plan(gates, model, eula_mode)
     if strict and incomplete:
         report.blocker("Incomplete strict gates: " + ", ".join(incomplete))
     elif incomplete:
@@ -586,14 +759,70 @@ def print_report(report: Report, as_json: bool) -> None:
         print(json.dumps(payload["facts"], indent=2, sort_keys=True))
 
 
+def print_plan(report: Report, as_json: bool) -> None:
+    identity = report.facts.get("release_identity", {})
+    plan = report.facts.get("release_plan")
+    payload = {
+        "release": identity,
+        "plan": plan,
+        "configuration_blockers": report.blockers,
+    }
+    if as_json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return
+    if identity:
+        print(
+            "Release: "
+            f"{identity.get('app')} {identity.get('version')} ({identity.get('build')}) "
+            f"[{identity.get('status')}]"
+        )
+    if report.blockers:
+        print("\nCONFIGURATION BLOCKERS")
+        for blocker in report.blockers:
+            print(f"- {blocker}")
+    if not isinstance(plan, dict):
+        print("\nNo dependency plan is available until the manifest is valid enough to read.")
+        return
+    if plan["complete"]:
+        print("\nNext: none; every release and submission gate is complete.")
+        return
+    print(f"\nNext phase: {plan['current_phase']}")
+    for entry in plan["next_gates"]:
+        print(f"- {entry['gate']} [{entry['owner']}]")
+    if plan["queued_phases"]:
+        print("Queued: " + " -> ".join(plan["queued_phases"]))
+    print(f"Remaining gates: {plan['remaining_gate_count']}")
+
+
 def init_manifest(project: Path, manifest: Path) -> int:
     if manifest.exists():
         print(f"Refusing to overwrite existing release ledger: {manifest}", file=sys.stderr)
         return 1
+    defaults = discover_release_defaults(project)
+    text = TEMPLATE.read_text(encoding="utf-8")
+    replacements = {
+        'name = "Example App"': f"name = {json.dumps(defaults['name'])}",
+    }
+    if "bundle_id" in defaults:
+        replacements['bundle_id = "com.example.app"'] = (
+            f"bundle_id = {json.dumps(defaults['bundle_id'])}"
+        )
+    if "version" in defaults:
+        replacements['version = "1.0.0"'] = f"version = {json.dumps(defaults['version'])}"
+    if "build" in defaults:
+        replacements['build = "1"'] = f"build = {json.dumps(defaults['build'])}"
+    for old, new in replacements.items():
+        text = text.replace(old, new, 1)
     manifest.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(TEMPLATE, manifest)
+    manifest.write_text(text, encoding="utf-8")
+    review_notes = project / ".app-store" / "review-notes.md"
+    if not review_notes.exists():
+        shutil.copyfile(REVIEW_NOTES_TEMPLATE, review_notes)
     print(f"Created {manifest}")
-    print("Replace placeholders, keep sensitive values in environment variables, then run check.")
+    discovered = ", ".join(sorted(defaults))
+    print(f"Auto-filled unique project facts: {discovered}.")
+    print(f"Created {review_notes}")
+    print("Replace remaining placeholders, keep sensitive values in environment variables, then run plan.")
     return 0
 
 
@@ -602,7 +831,7 @@ def parser() -> argparse.ArgumentParser:
         description="Initialize and validate an iOS App Store release ledger."
     )
     subparsers = command_parser.add_subparsers(dest="command", required=True)
-    for command in ("init", "check"):
+    for command in ("init", "check", "plan"):
         subparser = subparsers.add_parser(command)
         subparser.add_argument("--project", default=".", help="App repository root.")
         subparser.add_argument(
@@ -610,7 +839,7 @@ def parser() -> argparse.ArgumentParser:
             default=str(DEFAULT_MANIFEST),
             help="Manifest path, relative to the project unless absolute.",
         )
-        if command == "check":
+        if command in {"check", "plan"}:
             subparser.add_argument("--strict", action="store_true")
             subparser.add_argument("--json", action="store_true")
     return command_parser
@@ -626,7 +855,10 @@ def main() -> int:
     if args.command == "init":
         return init_manifest(project, manifest)
     report = validate_manifest(project, manifest, args.strict)
-    print_report(report, args.json)
+    if args.command == "plan":
+        print_plan(report, args.json)
+    else:
+        print_report(report, args.json)
     return 0 if not report.blockers else 1
 
 

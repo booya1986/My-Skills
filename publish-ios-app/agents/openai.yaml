@@ -1,4 +1,4 @@
 interface:
   display_name: "Publish iOS App"
   short_description: "Universal App Store release and review pipeline"
-  default_prompt: "Use $publish-ios-app to resume this iOS app from its first incomplete release gate and take it safely through App Store submission."
+  default_prompt: "Use $publish-ios-app to inspect this iOS project once, produce the shortest dependency-ordered release plan, reuse valid evidence, and carry the exact candidate through TestFlight and App Store submission."
