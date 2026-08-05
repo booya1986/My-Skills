@@ -77,6 +77,7 @@ GATE_PHASES = (
             "custom_eula_configured",
             "screenshots_complete",
             "review_information_complete",
+            "review_information_live_verified",
             "review_paths_verified",
         ),
     ),
@@ -207,6 +208,23 @@ def require_https_url(section: dict[str, Any], key: str, label: str, report: Rep
     return value.strip()
 
 
+def validate_optional_https_url(
+    section: dict[str, Any], key: str, label: str, report: Report
+) -> str:
+    value = section.get(key)
+    if value in (None, ""):
+        report.ok(f"{label} is not configured; this field is optional.")
+        return ""
+    if not isinstance(value, str) or is_placeholder(value):
+        report.blocker(f"{label} is still a placeholder.")
+        return ""
+    if not re.fullmatch(r"https://[^\s]+", value.strip(), flags=re.IGNORECASE):
+        report.blocker(f"{label} must be a complete HTTPS URL when configured.")
+        return ""
+    report.ok(f"{label} uses HTTPS; live reachability and copy still require an external check.")
+    return value.strip()
+
+
 def require_project_file(
     project: Path, section: dict[str, Any], key: str, label: str, report: Report
 ) -> None:
@@ -249,6 +267,7 @@ def required_release_gates(model: Any, eula_mode: Any) -> set[str]:
         "metadata_urls_live",
         "screenshots_complete",
         "review_information_complete",
+        "review_information_live_verified",
         "review_paths_verified",
         "native_payload_verified",
         "store_assets_match_build",
@@ -467,6 +486,7 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
     require_value(release, "release_notes", "Release notes", report)
     require_https_url(release, "privacy_policy_url", "Privacy policy URL", report)
     require_https_url(release, "support_url", "Support URL", report)
+    validate_optional_https_url(release, "marketing_url", "Marketing URL", report)
     terms_url = require_https_url(release, "terms_of_use_url", "Terms of Use URL", report)
     eula_mode = release.get("eula_mode")
     if eula_mode not in VALID_EULA_MODES:
@@ -515,9 +535,14 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
             f"{prefix}_PHONE",
         ]
         missing = [name for name in required_env if not os.environ.get(name)]
-        if missing:
+        if missing and gates.get("review_information_live_verified") is not True:
             report.blocker(
                 "Review contact environment variables are missing: " + ", ".join(missing)
+            )
+        elif missing:
+            report.ok(
+                "Review contact information was verified live in App Store Connect; "
+                "sensitive values are intentionally absent from the environment."
             )
         else:
             report.ok("Review contact environment variables are present; values were not read or printed.")

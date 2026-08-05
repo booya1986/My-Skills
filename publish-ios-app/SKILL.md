@@ -87,8 +87,12 @@ Read [release-evidence.md](references/release-evidence.md) when the project has 
 3. Detect the stack, Xcode project/workspace, schemes, bundle identifier, deployment target, version, build number, entitlements, privacy manifest, app icon set, StoreKit dependencies, and CI/release tooling.
 4. Inspect existing App Store Connect state through the API when available. Use the browser for unsupported screens and user-facing legal flows.
 5. Compare repository state, the release ledger, the uploaded build, and the App Store version record.
-6. Build a compact release-identity table for every active track and channel. At minimum include source commit, version, build, selected product set, tested channel, and live Apple status.
-7. Return the single current phase first, then blockers grouped as `code`, `assets`, `metadata`, `monetization`, `account`, `testing`, or `review`.
+6. Read supported device families from the processed/uploaded binary metadata
+   (for example `UIDeviceFamily`), not from the device Apple happens to use for
+   review. Still verify the responsive compatibility path on any review device
+   class Apple names.
+7. Build a compact release-identity table for every active track and channel. At minimum include source commit, version, build, selected product set, tested channel, and live Apple status.
+8. Return the single current phase first, then blockers grouped as `code`, `assets`, `metadata`, `monetization`, `account`, `testing`, or `review`.
 
 Read [project-stacks.md](references/project-stacks.md) when identifying or building a non-native stack.
 
@@ -163,18 +167,28 @@ Verify all of the following:
 - name, subtitle, description, keywords, categories, copyright, URLs, and release notes are complete;
 - the Terms of Use model is explicit: Apple Standard EULA or a configured custom EULA;
 - for Apple Standard EULA, its functional link appears in every submitted description localization; for a custom EULA, the agreement is configured for the intended regions in App Store Connect;
-- the Privacy, Terms, and Support URLs were opened successfully during this release;
+- the Privacy, Terms, Support, and any configured Marketing URLs were opened
+  successfully during this release and contain no obsolete product, renewal,
+  feature or pricing claims;
 - paid-product screens expose working Terms and Privacy links; auto-renewable subscriptions meet Apple's current in-app disclosure requirements;
 - screenshots meet Apple's current specification, show the real app, contain no alpha, and match supported devices;
 - screenshots and IAP Review Information assets depict the selected build and current product model rather than an older or future release;
 - the 1024×1024 App Store icon is present and opaque;
 - age rating, app privacy, content rights, encryption/export compliance, and availability are complete;
 - Review Information includes a reachable contact through environment-held values, accurate notes, and valid demo access when login is required;
+- set `review_information_live_verified` only after re-reading the saved App
+  Store Connect contact fields; once verified, keep their sensitive values out
+  of the repository and do not require them to persist in the shell environment;
 - every supported form factor whose responsive layout changes navigation has a
   verified reviewer path with exact visible labels, purchase CTA and required
   scrolling; set `review_paths_verified` only after those paths match the
   submitted build;
 - each in-app purchase or subscription has localization, price, availability, review notes, and its required review screenshot;
+- app-version Review Notes, every paid item's own Review Notes and the latest
+  App Review thread message agree on device-specific navigation, visible labels,
+  purchase timing, product type and renewal behavior; if a submitted item is
+  locked with stale notes, record the mismatch, clarify it in the review thread
+  only after approval, and replace the item notes before the next resubmission;
 - first-of-type In-App Purchases and the first subscription/group are included with the new app version when applicable;
 - product type, localized StoreKit price, trial/free-access language, renewal behavior, entitlement, app UI, description, screenshot, and Review Notes all describe the same offer;
 - agreements and finance gates are active or in an Apple-confirmed acceptable state.

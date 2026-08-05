@@ -92,6 +92,7 @@ class ReleaseCheckTests(unittest.TestCase):
             "terms_link_in_description",
             "screenshots_complete",
             "review_information_complete",
+            "review_information_live_verified",
             "review_paths_verified",
             "native_payload_verified",
             "store_assets_match_build",
@@ -131,6 +132,22 @@ class ReleaseCheckTests(unittest.TestCase):
         )
         report = self.validate(text)
         self.assertTrue(any("canonical Apple Standard EULA" in item for item in report.blockers))
+
+    def test_configured_marketing_url_requires_https(self) -> None:
+        text = self.manifest_text().replace(
+            'marketing_url = ""', 'marketing_url = "http://acme.test"'
+        )
+        report = self.validate(text)
+        self.assertTrue(
+            any("Marketing URL must be a complete HTTPS URL" in item for item in report.blockers)
+        )
+
+    def test_live_review_contact_gate_avoids_persisting_sensitive_values(self) -> None:
+        manifest = self.project / ".app-store" / "release.toml"
+        manifest.write_text(self.manifest_text(), encoding="utf-8")
+        with patch.dict(os.environ, {}, clear=True):
+            report = release_check.validate_manifest(self.project, manifest, strict=True)
+        self.assertFalse(any("Review contact environment variables" in item for item in report.blockers))
 
     def test_custom_eula_uses_app_store_connect_gate(self) -> None:
         text = self.manifest_text()

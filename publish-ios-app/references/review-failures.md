@@ -18,6 +18,9 @@ Use this list immediately before freezing a release and when App Review reports 
 - Required screenshot set is missing, has an alpha channel, uses an unsupported size, or shows a materially different UI.
 - Screenshots or paid-product Review Information depict a previous build, obsolete product model, or future feature not present in the selected binary.
 - Privacy policy or support URL is missing, broken, gated, or unrelated to the app.
+- A configured Marketing URL is live but still advertises an obsolete
+  subscription, trial, feature, limit or price that conflicts with the submitted
+  binary and store metadata.
 - Terms of Use is absent from a submitted description localization, points to a broken URL, or conflicts with the configured EULA. For Apple Standard EULA, keep the functional standard-EULA link in the description; for a custom EULA, configure it in App Store Connect and keep user-facing Terms access consistent.
 - Description, screenshots, or age rating promise features not in the submitted build.
 - Content-rights or export-compliance answer is incomplete.
@@ -45,11 +48,20 @@ Use this list immediately before freezing a release and when App Review reports 
   the row/control title, the purchase CTA, and any scrolling required. If an
   app-managed free-access action is shown alongside purchase, state whether the
   reviewer can purchase immediately or must first satisfy a real gate.
+- App-version Review Notes or a thread reply were corrected, but the paid
+  item's own Review Notes still contain the old device path or imply a different
+  purchase gate. Compare every reviewer-facing surface before submitting. If
+  Apple has locked a stale field during review, do not cancel reflexively;
+  preserve the corrected thread response and update the item field when Apple
+  returns it or it becomes editable.
 
 ## Functionality and policy
 
 - App crashes, hangs, presents an empty state, or requires unavailable backend/content.
 - The candidate was installed but never successfully launched and exercised on the device used as release evidence.
+- The release ledger marks iPad support because Apple reviewed on an iPad even
+  though the processed binary is iPhone-only. Derive supported families from
+  uploaded build metadata and treat the iPad run as a compatibility-layout path.
 - An update launches with data from a fresh install but fails with persisted data from the previous public version.
 - The primary screen renders but required controls or packaged media are missing in the native archive.
 - Permissions are requested without clear purpose strings or before their need is explained.

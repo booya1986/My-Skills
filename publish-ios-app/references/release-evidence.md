@@ -19,6 +19,7 @@ At minimum, record:
 | source | commit and clean/known working-tree state |
 | archive | version, build, bundle identifier, archive SHA-256 |
 | upload | Apple build identifier and Apple build number |
+| device support | processed binary device families and minimum OS; keep the reviewer's device class as separate compatibility-path evidence |
 | TestFlight | installed/tested build number and test result |
 | physical device | installed, launched, and exercised build number |
 | store version | version record, selected build, product set, submission ID |
@@ -51,6 +52,9 @@ Important distinctions:
 - `Ready for Review` is still a draft.
 - Installation is not successful launch.
 - A Debug/device build is not the TestFlight candidate.
+- Apple's review device does not prove that the binary natively supports that
+  device family; an iPhone-only app may be exercised on an iPad in compatibility
+  mode.
 - Apple approval is not necessarily public availability when release is manual or phased.
 
 ## Reuse and invalidation
