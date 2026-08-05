@@ -219,9 +219,12 @@ When Apple requests information, quote or summarize the exact issue, map it to t
 4. Re-run every gate invalidated by the change. Metadata-only fixes do not justify an untested binary change; binary fixes require a new build number and device/TestFlight validation.
 5. Reply in the original App Review or support thread after the requested action is complete, then verify the sent message and resulting Apple status.
 6. Reconcile the release ledger, canonical current-status document, agent
-   handoffs and reusable store/review copy. Search for stale references to the
-   prior build, product, submission, status, device path and verification date;
-   update current-state statements while preserving clearly labelled history.
+   handoffs and reusable store/review copy. Run a repository-wide search, not a
+   curated-document scan: include top-level handoffs, every release-plan and
+   runbook, platform metadata/release-note drafts, and dormant store copy that a
+   later release could reuse. Search for stale references to the prior build,
+   product, submission, status, device path and verification date; update
+   current-state statements while preserving clearly labelled history.
 7. Set `documentation_reconciled` only after that scan passes.
 8. Add a generalized prevention rule to `review-failures.md`, the manifest, or `release_check.py` when the lesson can prevent the same class of failure for other apps.
 
