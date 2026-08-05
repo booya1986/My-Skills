@@ -93,6 +93,7 @@ monetization_copy_matches = false
 native_payload_verified = false
 store_assets_match_build = false
 release_surfaces_match = false
+documentation_reconciled = false
 build_uploaded = false
 testflight_passed = false
 physical_device_passed = false

@@ -170,6 +170,10 @@ Verify all of the following:
 - the 1024×1024 App Store icon is present and opaque;
 - age rating, app privacy, content rights, encryption/export compliance, and availability are complete;
 - Review Information includes a reachable contact through environment-held values, accurate notes, and valid demo access when login is required;
+- every supported form factor whose responsive layout changes navigation has a
+  verified reviewer path with exact visible labels, purchase CTA and required
+  scrolling; set `review_paths_verified` only after those paths match the
+  submitted build;
 - each in-app purchase or subscription has localization, price, availability, review notes, and its required review screenshot;
 - first-of-type In-App Purchases and the first subscription/group are included with the new app version when applicable;
 - product type, localized StoreKit price, trial/free-access language, renewal behavior, entitlement, app UI, description, screenshot, and Review Notes all describe the same offer;
@@ -214,7 +218,12 @@ When Apple requests information, quote or summarize the exact issue, map it to t
 3. Fix only the smallest verified root cause. Do not create a replacement product or submission unless the product definition changed or Apple requires it.
 4. Re-run every gate invalidated by the change. Metadata-only fixes do not justify an untested binary change; binary fixes require a new build number and device/TestFlight validation.
 5. Reply in the original App Review or support thread after the requested action is complete, then verify the sent message and resulting Apple status.
-6. Add a generalized prevention rule to `review-failures.md`, the manifest, or `release_check.py` when the lesson can prevent the same class of failure for other apps.
+6. Reconcile the release ledger, canonical current-status document, agent
+   handoffs and reusable store/review copy. Search for stale references to the
+   prior build, product, submission, status, device path and verification date;
+   update current-state statements while preserving clearly labelled history.
+7. Set `documentation_reconciled` only after that scan passes.
+8. Add a generalized prevention rule to `review-failures.md`, the manifest, or `release_check.py` when the lesson can prevent the same class of failure for other apps.
 
 ## Tool policy
 
@@ -234,7 +243,9 @@ Do not call the release complete until:
 2. the exact uploaded build passed TestFlight and physical-device testing;
 3. required paid products are included and reviewable;
 4. the submission status proves Apple received it;
-5. the release ledger records the source commit, archive fingerprint, version, build, submission ID, verified status time, and any external wait.
+5. the release ledger records the source commit, archive fingerprint, version, build, submission ID, verified status time, and any external wait;
+6. `documentation_reconciled` confirms the ledger, canonical status, agent
+   handoffs and reusable store/review copy agree with the live result.
 
 If Apple is processing or reviewing, report the release as submitted and waiting, not published.
 

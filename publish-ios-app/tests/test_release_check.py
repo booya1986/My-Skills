@@ -96,6 +96,7 @@ class ReleaseCheckTests(unittest.TestCase):
             "native_payload_verified",
             "store_assets_match_build",
             "release_surfaces_match",
+            "documentation_reconciled",
             "build_uploaded",
             "testflight_passed",
             "physical_device_passed",

@@ -86,4 +86,9 @@ Use this list immediately before freezing a release and when App Review reports 
 8. Update metadata only when the binary is already correct.
 9. Draft a factual response with reproduction steps and validation evidence.
 10. Obtain approval before sending the response or resubmitting.
-11. Convert a broadly reusable lesson into a preflight gate; keep the app-specific chronology in its own release ledger.
+11. After the live status changes, reconcile the release ledger, canonical
+    current-status document, agent handoffs and reusable store/review copy.
+    Search for the prior build, product, submission ID, status, reviewer path
+    and verification date. Preserve historical entries but remove stale claims
+    from every current-state section.
+12. Convert a broadly reusable lesson into a preflight gate; keep the app-specific chronology in its own release ledger.

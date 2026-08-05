@@ -105,5 +105,8 @@ On every invocation:
 4. invalidate only mismatched evidence;
 5. continue from the first dependency blocker;
 6. leave external processing as `external wait`, not as work to repeat.
+7. after any live store mutation or review response, reconcile the ledger,
+   canonical status, agent handoffs and reusable review copy before declaring
+   the action delivered.
 
 This prevents the two expensive failure modes: redoing valid work and submitting evidence that belongs to a different candidate.

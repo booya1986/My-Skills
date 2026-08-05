@@ -91,7 +91,14 @@ GATE_PHASES = (
             "performance_passed",
         ),
     ),
-    ("consistency", ("store_assets_match_build", "release_surfaces_match")),
+    (
+        "consistency",
+        (
+            "store_assets_match_build",
+            "release_surfaces_match",
+            "documentation_reconciled",
+        ),
+    ),
     ("freeze", ("release_frozen",)),
     ("approval", ("submission_approved",)),
     ("submission", ("submitted",)),
@@ -246,6 +253,7 @@ def required_release_gates(model: Any, eula_mode: Any) -> set[str]:
         "native_payload_verified",
         "store_assets_match_build",
         "release_surfaces_match",
+        "documentation_reconciled",
         "build_uploaded",
         "testflight_passed",
         "physical_device_passed",
