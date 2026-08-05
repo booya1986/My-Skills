@@ -25,6 +25,20 @@ Never infer a tax-treaty article, withholding rate, legal capacity, business typ
 
 Apple may show intermediate states such as `Pending User Info`, `Processing`, or `Verifying`. Record the exact state; do not convert it to `Active` in the release ledger.
 
+## Secure compliance documents
+
+When Apple requests an identity, address, tax, bank, or other compliance document:
+
+1. Verify the request in the original Apple message and use only Apple's official secure upload destination.
+2. Ask the user to choose or explicitly approve the exact document and destination. Prefer the single accepted document that exposes the least unrelated personal data.
+3. Never attach the document to ordinary email when Apple supplied a secure upload link.
+4. In the native macOS file chooser, select by absolute path and re-check filename, type, and size before sending.
+5. Wait until the upload page displays an explicit terminal success such as `Completed`; progress or a click is not evidence.
+6. Reply in the original support thread when Apple requests it, without reattaching the sensitive document, and verify the reply appears in Sent.
+7. Record the case number, action time, and pending Apple status without recording document numbers or sensitive contents.
+
+An uploaded document is not an approved compliance status. Keep the gate as an `external wait` until App Store Connect or Apple Support confirms verification.
+
 ## Safe browser workflow
 
 1. Keep only the relevant App Store Connect page in scope.

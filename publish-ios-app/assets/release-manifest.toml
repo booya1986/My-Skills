@@ -1,4 +1,4 @@
-schema_version = 1
+schema_version = 3
 
 [app]
 name = "Example App"
@@ -14,6 +14,8 @@ status = "draft"
 release_notes = "Describe user-visible changes."
 privacy_policy_url = "https://example.com/privacy"
 support_url = "https://example.com/support"
+terms_of_use_url = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+eula_mode = "apple-standard"
 category = "Choose in App Store Connect"
 content_rights = "unresolved"
 encryption = "unresolved"
@@ -23,8 +25,20 @@ review_notes_file = ".app-store/review-notes.md"
 review_contact_env_prefix = "ASC_REVIEW"
 
 [monetization]
-model = "free"
+model = "unresolved"
 first_subscription = false
+
+# For an In-App Purchase app, set model = "iap" and add one or more entries.
+# Keep only products intended for this release; list historical objects in the
+# app's release documentation rather than silently attaching them.
+#
+# [[in_app_purchases]]
+# product_id = "com.example.app.lifetime"
+# type = "non_consumable"
+# entitlement = "premium"
+# first_of_type = true
+# review_screenshot = "store-assets/iap-review/lifetime.png"
+# review_notes_file = ".app-store/iap-lifetime-review-notes.md"
 
 # For a subscription app, set model = "subscription" and add one or more
 # entries like this. Keep credentials and account identifiers out of this file.
@@ -36,11 +50,23 @@ first_subscription = false
 # price_note = "Select the intended storefront price in App Store Connect"
 # introductory_offer = "P3D_FREE"
 # entitlement = "premium"
+# review_screenshot = "store-assets/iap-review/monthly.png"
+# review_notes_file = ".app-store/subscription-monthly-review-notes.md"
 
 [artifacts]
 app_icon_1024 = "store-assets/app-icon-1024.png"
 screenshots_dir = "store-assets/screenshots"
 privacy_manifest = ""
+
+[evidence]
+source_commit = ""
+archive_sha256 = ""
+uploaded_build_id = ""
+uploaded_build_number = ""
+testflight_tested_build = ""
+device_tested_build = ""
+submission_id = ""
+status_checked_at = ""
 
 [gates]
 account_holder_confirmed = false
@@ -54,12 +80,25 @@ age_rating_complete = false
 content_rights_complete = false
 export_compliance_complete = false
 metadata_complete = false
+metadata_urls_live = false
+terms_link_in_description = false
+custom_eula_configured = false
 screenshots_complete = false
 review_information_complete = false
+review_paths_verified = false
 products_ready = false
+iap_review_assets_complete = false
+in_app_legal_links = false
+monetization_copy_matches = false
+native_payload_verified = false
+store_assets_match_build = false
+release_surfaces_match = false
 build_uploaded = false
 testflight_passed = false
 physical_device_passed = false
+cold_launch_passed = false
+critical_path_passed = false
+performance_passed = false
 release_frozen = false
 submission_approved = false
 submitted = false
