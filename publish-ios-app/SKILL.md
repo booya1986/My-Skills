@@ -225,6 +225,15 @@ Monitor without changing scope:
 
 When Apple requests information, quote or summarize the exact issue, map it to the relevant file or App Store field, propose a response, and wait for approval before sending messages or changing the submission. Record the final status in the release ledger.
 
+When Apple approves a release, do not equate approval with public availability:
+
+1. Record the approval message and accepted app/IAP items against the exact submission ID.
+2. Check the configured release method. For manual or phased release, keep the state at `approved` until the public storefront proves availability.
+3. Verify the public App Store page and Apple's Lookup service for the app ID in the primary storefront and one representative secondary storefront. Confirm the result count, bundle identifier, version, price, public URL and release timestamp.
+4. Set `release.status = "released"`, `evidence.public_store_url`, `evidence.released_at` and `evidence.status_checked_at` only after that public proof exists.
+5. Enable website download badges or marketing links only after public verification, deploy the change, and re-open the deployed link.
+6. Do not retroactively mark skipped TestFlight, physical-device, purchase-lifecycle or performance gates as passed because Apple approved the app. Carry them forward as explicit post-release risk work and mandatory gates for the next build.
+
 ### Review-response loop
 
 1. Preserve the exact message, affected submission ID, app version/build, item statuses, and guideline reference without copying personal data into the repository.
@@ -254,7 +263,7 @@ When Apple requests information, quote or summarize the exact issue, map it to t
 
 ## Completion criteria
 
-Do not call the release complete until:
+Do not call the release pipeline complete until:
 
 1. all strict local gates pass;
 2. the exact uploaded build passed TestFlight and physical-device testing;
@@ -265,6 +274,7 @@ Do not call the release complete until:
    handoffs and reusable store/review copy agree with the live result.
 
 If Apple is processing or reviewing, report the release as submitted and waiting, not published.
+If Apple has released an app before every safety gate was completed, accurately report it as public while separately reporting the incomplete gates. Approval and availability are evidence of delivery, not substitutes for missing QA.
 
 ## Resources
 

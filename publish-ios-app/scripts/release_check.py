@@ -225,6 +225,15 @@ def validate_optional_https_url(
     return value.strip()
 
 
+def is_iso8601_timestamp(value: Any) -> bool:
+    return isinstance(value, str) and bool(
+        re.fullmatch(
+            r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?(?:Z|[+-]\d{2}:\d{2})",
+            value,
+        )
+    )
+
+
 def require_project_file(
     project: Path, section: dict[str, Any], key: str, label: str, report: Report
 ) -> None:
@@ -742,8 +751,27 @@ def validate_manifest(project: Path, manifest_path: Path, strict: bool) -> Repor
         checked_at = evidence.get("status_checked_at")
         require_value(evidence, "status_checked_at", "Status verification time", report)
         if isinstance(checked_at, str) and not is_placeholder(checked_at):
-            if not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?(?:Z|[+-]\d{2}:\d{2})", checked_at):
+            if not is_iso8601_timestamp(checked_at):
                 report.blocker("evidence.status_checked_at must be an ISO-8601 timestamp with timezone.")
+
+    if status == "released":
+        public_store_url = require_https_url(
+            evidence,
+            "public_store_url",
+            "Public App Store URL evidence",
+            report,
+        )
+        if public_store_url and not re.fullmatch(
+            r"https://apps\.apple\.com/(?:[a-z]{2}/)?app/(?:[^/?#]+/)?id\d+(?:[/?#].*)?",
+            public_store_url,
+            flags=re.IGNORECASE,
+        ):
+            report.blocker("evidence.public_store_url must be an apps.apple.com app URL.")
+        released_at = evidence.get("released_at")
+        require_value(evidence, "released_at", "Public release time evidence", report)
+        if isinstance(released_at, str) and not is_placeholder(released_at):
+            if not is_iso8601_timestamp(released_at):
+                report.blocker("evidence.released_at must be an ISO-8601 timestamp with timezone.")
 
     if gates.get("release_frozen") is True:
         prerequisites = (

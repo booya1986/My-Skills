@@ -203,6 +203,28 @@ review_notes_file = ".app-store/iap-notes.md"
             )
         )
 
+    def test_released_status_requires_public_storefront_evidence(self) -> None:
+        text = self.manifest_text().replace('status = "ready"', 'status = "released"')
+        report = self.validate(text)
+        self.assertTrue(
+            any("Public App Store URL evidence" in item for item in report.blockers)
+        )
+        self.assertTrue(
+            any("Public release time evidence" in item for item in report.blockers)
+        )
+
+    def test_released_status_accepts_verified_public_storefront_evidence(self) -> None:
+        text = self.manifest_text().replace('status = "ready"', 'status = "released"')
+        text = text.replace(
+            'public_store_url = ""',
+            'public_store_url = "https://apps.apple.com/app/release-test/id1234567890"',
+        )
+        text = text.replace(
+            'released_at = ""', 'released_at = "2026-08-07T02:51:38+03:00"'
+        )
+        report = self.validate(text)
+        self.assertEqual([], report.blockers)
+
     def test_plan_returns_only_the_first_incomplete_phase(self) -> None:
         text = self.manifest_text().replace(
             "metadata_complete = true", "metadata_complete = false"

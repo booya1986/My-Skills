@@ -24,6 +24,7 @@ At minimum, record:
 | physical device | installed, launched, and exercised build number |
 | store version | version record, selected build, product set, submission ID |
 | metadata/assets | localization set and the build/product UI they depict |
+| public storefront | public App Store URL, Lookup result, matching bundle/version, price, release timestamp and storefronts checked |
 
 If the repository maintains more than one release track, name each track and make its version/build explicit before acting. Future-version work must not silently enter a pending first release, and a pending release's screenshots or approvals do not automatically prove the future version.
 
@@ -56,6 +57,19 @@ Important distinctions:
   device family; an iPhone-only app may be exercised on an iPad in compatibility
   mode.
 - Apple approval is not necessarily public availability when release is manual or phased.
+- A public result in one storefront does not prove every configured storefront has propagated; verify the primary storefront and at least one representative secondary storefront.
+
+## Post-release proof
+
+After approval, verify release independently of App Store Connect:
+
+1. Open the public App Store URL and require a successful response.
+2. Query Apple's public Lookup service by app ID in the primary storefront and one representative secondary storefront.
+3. Match `bundleId`, `version`, `trackViewUrl`, displayed price and `releaseDate` to the release ledger.
+4. Record the canonical public URL, public release timestamp and verification time with timezone.
+5. Only then enable public download badges and verify the deployed destination.
+
+Keep approval evidence and public-storefront evidence separate. If propagation is incomplete, use `approved` plus an external wait; use `released` only after public proof. Never backfill unperformed QA gates from Apple's approval.
 
 ## Reuse and invalidation
 

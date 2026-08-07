@@ -67,6 +67,8 @@ uploaded_build_number = ""
 testflight_tested_build = ""
 device_tested_build = ""
 submission_id = ""
+public_store_url = ""
+released_at = ""
 status_checked_at = ""
 
 [gates]
