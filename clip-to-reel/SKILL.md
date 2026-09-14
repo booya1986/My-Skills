@@ -1,6 +1,6 @@
 ---
 name: clip-to-reel
-description: Turn a spoken passage from ANY existing video — a talking-head recording, a screen recording with a webcam bubble, a selfie video, a podcast or lecture — into a finished vertical 9:16 explainer reel in a proven "paper-split" creator style — cuts only on verified silences, split / studio / full-face / dark-terminal modes, heavy 1–3-word caption chips on the seam, real logos, a licensed web b-roll card, a music bed, SFX on every cut, a full-screen keyword CTA card, and an independent judge-agent similarity loop against a reference reel. Use this whenever the user gives a video (file or path) plus a timecode range or a pasted transcript excerpt and wants a Reel / Short / TikTok out of it — "make a reel from 16:20 to 16:54", "turn this part into a short", "another clip like the last reel", "copy the style of this creator's reel" — even if the skill isn't named.
+description: Turns a spoken passage from ANY existing video — a talking-head recording, a screen recording with a webcam bubble, a selfie video, a podcast or lecture — into a finished vertical 9:16 explainer reel in a proven "paper-split" creator style — cuts only on verified silences, split / studio / full-face / dark-terminal modes, heavy 1–3-word caption chips on the seam, real logos, a licensed web b-roll card, a music bed, SFX on every cut, a full-screen keyword CTA card, and an independent judge-agent similarity loop against a reference reel. Use this whenever the user gives a video (file or path) plus a timecode range or a pasted transcript excerpt and wants a Reel / Short / TikTok out of it — "make a reel from 16:20 to 16:54", "turn this part into a short", "another clip like the last reel", "copy the style of this creator's reel" — even if the skill isn't named.
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, Agent
 ---
 
@@ -55,6 +55,20 @@ they are not this style.
 
 Work in `_work/<slug>/` for intermediates and `reel-<slug>/` for the HyperFrames project.
 
+Copy this checklist into your reply and tick items as you go:
+
+```
+Reel progress:
+- [ ] 1 Passage mapped (words, silences, layout sheet)
+- [ ] 2 Cuts verified by transcription on both sides; voice assembled
+- [ ] 3 Face clips rendered (bubble tracked / clean full-frame window)
+- [ ] 4 B-roll card, logos, music bed, voice polish ready
+- [ ] 5 Project set up and scenes composed to the mode table
+- [ ] 6 check_glyphs NONE · hyperframes check 0 errors · snapshot sheet reviewed · loudness −14 ±0.7
+- [ ] 7 Judge loop run (≥90 % or plateau explained)
+- [ ] 8 Full + share copy delivered with cut list and score
+```
+
 ### 1 · Map the passage
 1. **Words:** use an existing word-level transcript, or run `bash scripts/transcribe.sh SOURCE.mp4 _work/<slug>/words.json [lang]`.
 2. **Voice:** `ffmpeg -i SOURCE -vn -ac 1 -ar 48000 _work/<slug>/voice.wav`.
@@ -89,14 +103,14 @@ Work in `_work/<slug>/` for intermediates and `reel-<slug>/` for the HyperFrames
 - **Music:** `bash scripts/make_music_bed.sh TRACK <duration> media/music_bed.mp3 [loop_from] [loop_to]`.
 - **Paper grain:** `python3 scripts/make_paper_grain.py media/paper_grain.png`.
 - **Voice polish:** de-ess plus light compression, then re-measure loudness to −14 ±0.7 LUFS.
-- **SFX:** a short whoosh, click, soft impact and boom (any royalty-free or synthesized set) in `media/sfx/`.
+- **SFX:** synthesized by `setup_project.sh` (`scripts/make_sfx.py`); swap in your own set if you prefer.
 
 ### 5 · Compose
-1. **Set up the project:**
-   1. Run `npx hyperframes init reel-<slug>`.
-   2. Copy `assets/reference-composition.html` to `reel-<slug>/index.html`.
-   3. Put the fonts in `fonts/`: Noto Sans for your script plus JetBrains Mono (both OFL, from Google Fonts), named as in the `@font-face` rules.
-   4. Keep the template's CSS system, `snap` / `push` helpers, caption rows, web card and CTA card. Replace the placeholder copy, scenes, media paths and timings.
+1. **Set up the project:** `bash scripts/setup_project.sh reel-<slug> [font-family]` (default "Noto Sans Hebrew";
+   "Noto Sans" for Latin-only). It creates the pinned HyperFrames project and brings the approved composition,
+   GSAP, Google Fonts subsets, simple-icons logos, synthesized SFX and paper grain. Keep the template's CSS system,
+   `snap` / `push` helpers, caption rows, web card and CTA card; replace the placeholder copy, scenes, media
+   paths and timings.
 2. **Scene list:** follow the proportions in `references/design-system.md`:
    - split ≈25 %;
    - studio ≈50 %, including one 5–6 s multi-beat window;
@@ -139,6 +153,11 @@ Usually that's a low-resolution face source, fixable only by a native vertical r
 ### 8 · Deliver
 1. Export both files. The share copy: `ffmpeg -i … -c:v libx264 -crf 21 -preset slow -c:a aac -b:a 160k -movflags +faststart`.
 2. Report: the cut list (and any filler that stayed), the final judge score, and remaining weaknesses.
+
+## Evaluations
+
+`evals/evals.json` holds three realistic scenarios (bubble recording, full-frame talking head, new reference)
+with expected behaviours. Rerun them after changing this skill.
 
 ## New reference
 To copy a different creator's reel:
