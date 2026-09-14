@@ -42,3 +42,22 @@
 ## Judge loop
 - Judges disagree by ±3 points; don't chase noise. Stop after ~3 rounds without a trend and name the real limit.
 - Keep each judge blind to previous scores and tell it about the deliberate style choices (CTA card, sans word, web card).
+
+## Learned on the second run (a 45 s passage with only ~10 s of face)
+- **Passages that are mostly animation in the source have little lip-synced face.** Put the split scenes exactly on
+  the face windows (measure them: the bubble region's mean/std jumps on the frame of the cut) and never reuse face
+  footage under other audio. Tell the judge up front so it scores execution, not the source.
+- **A single uncut take beats a filler cut.** If the only pause is ~70 ms, don't cut — take the whole block and
+  trim length elsewhere (a 45 s take with a 2.4 s CTA card scored fine).
+- **`select='gt(scene,0.25)'` misses light-to-light cuts** (studio→studio, paper→studio score 0.07–0.25). Give
+  the judge both 0.25 and 0.10 thresholds, and make cuts read by alternating full-screen backgrounds white studio ↔
+  cool grey `.studio2`; keep beige paper for split tops and the CTA only (paper in full-screen scenes was penalised).
+- **Punch-in cuts inside long scenes** add real cuts: `tl.set(snap,{transformOrigin, scale:1.22})` → `to(1.18)`.
+  Above ~1.2 windows crop at the frame edges. Keep content above the caption row: with push-in Y' and scale k,
+  origin y ≥ (k·Y' − 1180)/(k − 1).
+- **A split longer than ~4 s reads as one hold** — break it with a 1.5 s full-screen studio insert of that beat's
+  graphic, moving the overlapping chips to `#capLow`.
+- **Auto-grouped captions split phrases badly** (e.g. a chip ending mid-phrase). Write chips by hand from the cue text, 1–3 words,
+  split by meaning, and cut chips at mode boundaries.
+- **Check that the render actually finished** before copying "the newest file": compare its mtime/duration.
+- Scores on run 2: 63 → 69 → 77 → (round 4). Rising scores = keep iterating; flat ±3 = stop.

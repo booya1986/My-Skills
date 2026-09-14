@@ -8,7 +8,7 @@ Measured from the reference (38.08 s, 1080×1920, −14.3 LUFS, 12 detected cuts
 | Mode | What it is | Target share | Rules |
 |---|---|---|---|
 | **Split** | beige paper top (0–954 px), face bottom (954–1920), chip on the seam | ≈25 % | Return to split several times mid-reel, not just open/close. 2–3 graphic beats inside the first split. |
-| **Studio** | full-screen light radial background with Apple-like UI mocks | ≈50 % | Include one long multi-beat window (5–6 s) where things keep happening. No single shot > 6 s. |
+| **Studio** | full-screen light radial background (alternate white `.studio` and cool grey `.studio2` across cuts) with Apple-like UI mocks | ≈50 % | Include one long multi-beat window (5–6 s) where things keep happening. No single shot > 6 s. |
 | **Full face** | face fills 1080×1920 | ≈15 % | Only from a clean full-frame window. Max ~2.5 s per shot; push-in ≤ 3 %. |
 | **Dark** | black, glowing orange mono + pixel wordmark, scanlines | one beat ≤ 2 s | Typing finishes inside the beat. |
 | **Web card** | licensed stock clip in a white-framed 16:9 card + floating real-logo tiles | one beat ~1.7 s | Bright, warm grade. Icons drift so it is never static. |
