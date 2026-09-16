@@ -39,5 +39,5 @@ Node with [HyperFrames](https://hyperframes.heygen.com), and optionally `yt-dlp`
 | `references/media-recipes.md` | ffmpeg recipes for faces, b-roll, voice polish, share copy |
 | `references/judge-prompt.md` | the similarity-judge rubric |
 | `references/gotchas.md` | lessons that each cost a render |
-| `scripts/` | transcription, silence finding, cut verification, voice assembly, bubble tracking, paper grain, music bed, glyph check, judge sheets |
+| `scripts/` | transcription, silence finding, cut verification, voice assembly, bubble tracking, paper grain, music bed, glyph check, frame-fit check, judge sheets |
 | `assets/reference-composition.html` | the approved composition, with placeholder copy |

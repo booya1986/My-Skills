@@ -52,9 +52,12 @@
 - **`select='gt(scene,0.25)'` misses light-to-light cuts** (studio→studio, paper→studio score 0.07–0.25). Give
   the judge both 0.25 and 0.10 thresholds, and make cuts read by alternating full-screen backgrounds white studio ↔
   cool grey `.studio2`; keep beige paper for split tops and the CTA only (paper in full-screen scenes was penalised).
-- **Punch-in cuts inside long scenes** add real cuts: `tl.set(snap,{transformOrigin, scale:1.22})` → `to(1.18)`.
-  Above ~1.2 windows crop at the frame edges. Keep content above the caption row: with push-in Y' and scale k,
-  origin y ≥ (k·Y' − 1180)/(k − 1).
+- **Windows must never leave the frame.** Scales multiply: snap × push-in × punch-in × the element's own pop. A
+  900 px window under push 1.14 × punch 1.18 is 1210 px wide and gets cut on both sides. Budget it: element width ×
+  every scale on it ≤ 1040. For 860–900 px windows use push ≤ 1.03–1.04 and punch-in `set(1.13)` → `to(1.10)`; keep
+  side-by-side cards ≥ 110 px from the edges. `scripts/check_frame_fit.sh` is the gate — it must print NONE.
+- **Punch-in cuts inside long scenes** add real cuts: `tl.set(snap,{transformOrigin, scale:1.13})` → `to(1.10)`.
+  Keep content above the caption row: with push-in Y' and scale k, origin y ≥ (k·Y' − 1180)/(k − 1).
 - **A split longer than ~4 s reads as one hold** — break it with a 1.5 s full-screen studio insert of that beat's
   graphic, moving the overlapping chips to `#capLow`.
 - **Auto-grouped captions split phrases badly** (e.g. a chip ending mid-phrase). Write chips by hand from the cue text, 1–3 words,

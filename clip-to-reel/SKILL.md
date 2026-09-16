@@ -64,7 +64,7 @@ Reel progress:
 - [ ] 3 Face clips rendered (bubble tracked / clean full-frame window)
 - [ ] 4 B-roll card, logos, music bed, voice polish ready
 - [ ] 5 Project set up and scenes composed to the mode table
-- [ ] 6 check_glyphs NONE · hyperframes check 0 errors · snapshot sheet reviewed · loudness −14 ±0.7
+- [ ] 6 check_glyphs NONE · hyperframes check 0 errors · check_frame_fit NONE · snapshot sheet reviewed · loudness −14 ±0.7
 - [ ] 7 Judge loop run (≥90 % or plateau explained)
 - [ ] 8 Full + share copy delivered with cut list and score
 ```
@@ -133,6 +133,7 @@ Reel progress:
 ```bash
 python3 scripts/check_glyphs.py index.html                      # NONE (extend RANGES for your script)
 npx --yes hyperframes check                                     # 0 errors, no contrast failures
+bash scripts/check_frame_fit.sh index.html                          # NONE: no window/card leaves the frame, ever
 npx --yes hyperframes snapshot --at <one time per scene>        # then READ the contact sheet
 npm run render
 ```
