@@ -1,9 +1,14 @@
 # clip-to-reel
 
 Turn any spoken passage of a long video (a talking head, a screen recording with a webcam bubble, a podcast) into a
-finished vertical 9:16 explainer reel in a proven creator style. The output has paper split screens, bright UI-mock scenes, heavy caption chips,
-snap-zoom cuts with SFX, a music bed and a keyword CTA card. An independent judge agent scores it against a reference
-reel.
+finished vertical 9:16 explainer reel in one of two proven creator styles you pick first:
+
+- **A · Paper split:** paper split screens, bright UI-mock scenes, heavy caption chips, snap-zoom cuts with SFX,
+  a music bed and a keyword CTA card.
+- **B · Editorial collage:** Vox-style animated paper-cut collages (generated with Higgsfield) in your brand colour,
+  minimal white chat/doc UI, a small face card, 0.1 s bursts and a collage-sign CTA.
+
+In both styles an independent judge agent scores the result against a reference reel.
 
 **For:** creators and teams who already have long-form video and want short vertical clips that look designed, not
 just cropped.
@@ -21,7 +26,8 @@ Standalone: read `SKILL.md` and follow the eight steps manually. Every script in
 ## Requirements
 
 `ffmpeg`, `python3` (+ `numpy`, `Pillow`), `whisper.cpp` with a large-v3-turbo model (`WHISPER_MODEL=/path/to/model.bin`),
-Node with [HyperFrames](https://hyperframes.heygen.com), and optionally `yt-dlp`.
+Node with [HyperFrames](https://hyperframes.heygen.com), optionally `yt-dlp`, and for style B a
+[Higgsfield](https://higgsfield.ai) connection (image + video generation).
 
 ## 5-minute quick start
 
@@ -37,7 +43,10 @@ Node with [HyperFrames](https://hyperframes.heygen.com), and optionally `yt-dlp`
 | `SKILL.md` | the workflow |
 | `references/design-system.md` | modes, proportions, tokens, caption chips, motion vocabulary |
 | `references/media-recipes.md` | ffmpeg recipes for faces, b-roll, voice polish, share copy |
-| `references/judge-prompt.md` | the similarity-judge rubric |
+| `references/styles.md` | the A/B style picker shown to the user |
+| `references/judge-prompt.md` | the similarity-judge rubric (style A) |
+| `references/style-b/` | style B design system and judge rubric |
 | `references/gotchas.md` | lessons that each cost a render |
-| `scripts/` | transcription, silence finding, cut verification, voice assembly, bubble tracking, paper grain, music bed, glyph check, frame-fit check, judge sheets |
-| `assets/reference-composition.html` | the approved composition, with placeholder copy |
+| `scripts/` | transcription, silence finding, cut verification, voice assembly, bubble tracking, paper grain, music bed, glyph check, frame-fit check, accent recolouring, judge sheets |
+| `assets/reference-composition.html` | the approved style-A composition, with placeholder copy |
+| `assets/style-b/reference-build.py` | the style-B generator (writes `index.html`), with placeholder copy |

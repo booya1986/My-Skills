@@ -64,3 +64,28 @@
   split by meaning, and cut chips at mode boundaries.
 - **Check that the render actually finished** before copying "the newest file": compare its mtime/duration.
 - Scores on run 2: 63 → 69 → 77 → (round 4). Rising scores = keep iterating; flat ±3 = stop.
+
+## Learned building style B (editorial collage)
+- **Never show a face bigger than ~1.2× its source pixels.** A 164 px webcam bubble shown at half-screen looked
+  pixelated to the user, and neither ByteDance (1 credit/min-ish) nor Topaz (1 credit/s) upscaling added real
+  detail to a ~60 px face. Use the small face card.
+- **GSAP `fromTo` ignores props that appear only in the from-vars.** `fromTo(card,{autoAlpha:1,y:160},{y:0})` never
+  showed a card hidden earlier by `set(autoAlpha:0)`. Put every prop in the to-vars too.
+- **A JavaScript error in the timeline script is not a lint error.** Symptoms: `check` suddenly reports contrast
+  failures on hidden elements, and `check_frame_fit.sh` times out waiting for `__timelines`. A `const` used before
+  its declaration (TDZ) was the cause — declare shared tables at the top of the script.
+- **The HyperFrames mixer can pull integrated loudness down ~2 dB** when many SFX tracks overlap. Always measure the
+  render and, if needed, finish with a two-pass `loudnorm=I=-14:TP=-1:LRA=7:linear=true` (video `-c copy`).
+- **zsh reads `$var:l` as a modifier** (lower-case) — write `${var}:linear=true`.
+- **ffmpeg inside a `bash <<EOF` loop eats the heredoc** — add `-nostdin`.
+- **Judges misread timestamps** by a few seconds on long reels; map their notes to your scene table before editing.
+  Also give the judge the client decisions (small card, brand colour, no face where the source has none), or it
+  keeps asking to fake lip-sync.
+- **Generated collages come out in the model's favourite red/blue.** Ask for the brand colour in the prompt, or run
+  `recolor_accents.py` (free). Mapping every accent to the brand colour looked flat — one band to brand, the rest to
+  charcoal.
+- **Recurring judge asks for style B:** no blank frame between a burst and the next scene (extend the last burst
+  shot by 1 frame); no UI stretch over ~5 s without motion (stop-motion steps on a blurred collage backdrop behind
+  the UI fixed it); don't reuse the CTA plate in a burst; split chips longer than ~1.2 s.
+- **Style B scores on an 81 s test reel:** 65 → 81 → 79 → 80 → 84 → 83 → 85 → 84. The ceiling was the small, soft
+  face and the absence of a face in a third of the source.

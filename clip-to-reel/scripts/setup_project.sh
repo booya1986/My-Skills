@@ -3,6 +3,8 @@
 #   bash setup_project.sh reel-<slug> [script-family]
 #   script-family: Google Fonts family for chips/headlines, default "Noto Sans Hebrew"
 #                  (use "Noto Sans" for Latin-only, "Noto Sans Arabic", ...)
+#   Style B: run it, then `cp $SK/assets/style-b/reference-build.py <dir>/build.py && python3 build.py`, then run it
+#   again so the fonts the new index.html references are fetched.
 # Result: index.html (the approved composition), gsap.min.js, fonts/, media/sfx/, media/paper_grain.png,
 # media/logos/, package.json with a pinned hyperframes. Re-running is safe: existing files are kept.
 set -euo pipefail
@@ -44,6 +46,8 @@ for f in $(grep -o 'fonts/[A-Za-z0-9_-]*\.woff2' "$DIR/index.html" | sort -u); d
   case "$f" in
     *JetBrainsMono-400*) fetch_subset "JetBrains Mono" 400 latin "$out" ;;
     *JetBrainsMono-700*) fetch_subset "JetBrains Mono" 700 latin "$out" ;;
+    *FrankRuhl-hebrew*)  fetch_subset "Frank Ruhl Libre" 400 hebrew "$out" ;;
+    *FrankRuhl-latin*)   fetch_subset "Frank Ruhl Libre" 400 latin "$out" ;;
     *-latin*)            fetch_subset "$FAMILY" "300..900" latin "$out" || fetch_subset "$FAMILY" 800 latin "$out" ;;
     *)                   sub=$(echo "$FAMILY" | awk '{print tolower($NF)}'); [ "$sub" = sans ] && sub=latin
                          fetch_subset "$FAMILY" "300..900" "$sub" "$out" || fetch_subset "$FAMILY" 800 "$sub" "$out" ;;
