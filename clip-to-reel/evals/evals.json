@@ -1,0 +1,67 @@
+{
+  "skill_name": "clip-to-reel",
+  "evals": [
+    {
+      "id": 1,
+      "name": "screen-recording-with-webcam-bubble",
+      "prompt": "Make a reel from talk_screen.mp4, 02:10 to 03:17. It's a screen recording with my webcam bubble in the bottom-right corner, and the recorder zooms the bubble in and out. CTA keyword GUIDE.",
+      "files": [
+        "talk_screen.mp4"
+      ],
+      "expected_behavior": [
+        "Asks the user to choose style A or B (shows references/styles.md) before building",
+        "Runs find_cuts.py and verify_cut_edges.sh; every speech cut lands in a verified silence and the reel opens on a sentence start",
+        "Tracks the animated bubble with track_bubble.py instead of a fixed crop",
+        "Uses setup_project.sh and the reference composition; scenes follow the mode table (split, studio incl. one 5-6 s window, full face, one dark beat <=2 s, framed web card, full-screen CTA card)",
+        "Captions are 1-3 words per chip, in the seam row during split scenes",
+        "check_glyphs prints NONE, check_frame_fit prints NONE, hyperframes check has 0 errors, loudness is -14 +/-0.7 LUFS, no silent head or tail",
+        "Delivers a full-quality mp4 and a share copy under 30 MB plus the cut list and judge score"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "full-frame-talking-head-transcript-excerpt",
+      "prompt": "Here's the part I want as a Short, from my podcast.mp4 (just me on camera the whole time): \"the reason most teams fail at onboarding is that they explain the tool before the problem...\" up to \"...and that's the whole trick.\" English, CTA word ONBOARD.",
+      "files": [
+        "podcast.mp4"
+      ],
+      "expected_behavior": [
+        "Locates the excerpt in a word-level transcript (transcribes with transcribe.sh if none exists) and maps it to exact times",
+        "Keeps LTR direction for chips and motion, and extends nothing Hebrew-specific",
+        "Uses the full-frame face for split, full-face shots; no bubble tracking",
+        "Keeps any filler that has no pause on both sides and reports it",
+        "Produces the approved look, not a banner/PIP/subtitle-bar template"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "different-reference-reel",
+      "prompt": "Same process as last time but copy the style of this reel instead: https://www.instagram.com/reel/EXAMPLE/ — clip is lecture.mp4 14:02-14:40.",
+      "files": [
+        "lecture.mp4"
+      ],
+      "expected_behavior": [
+        "Downloads the new reference with yt-dlp for analysis only and makes 1 fps and 5 fps sheets plus cut detection",
+        "Writes the measured grammar into a copy of design-system.md and adapts criterion 1 of the judge prompt before composing",
+        "Runs the judge loop against the new reference, stopping at >=90 % or explaining the plateau"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "style-b-collage-from-bubble-recording",
+      "prompt": "Make a reel from lesson5.mp4, 05:18 to 08:20, in the collage style (style B). My brand colour is #22C55E. You can use Higgsfield. CTA keyword GUIDE.",
+      "files": [
+        "lesson5.mp4"
+      ],
+      "expected_behavior": [
+        "Condenses the 3-minute passage to about 60-80 s using only verified silences, and reports any filler that stayed",
+        "Reads the Higgsfield balance before and after every generation and reports the cost of each step",
+        "Keeps the webcam face in a small card (no larger than ~1.2x its source pixels) and hides it where the source has no face instead of faking lip-sync",
+        "Generates one paper-cut collage per spoken idea with the brand colour as the accent, animates the strongest 5-8, and uses recolor_accents.py instead of regenerating when only the palette is wrong",
+        "No UI stretch longer than ~5 s without an overlay, burst or stepped backdrop; a 0.1 s burst in the first second",
+        "check_glyphs NONE, hyperframes check passes, check_frame_fit NONE, final loudness -14 +/-0.7 LUFS",
+        "Runs the style-B judge prompt with the client decisions stated and stops at >=90% or a named plateau"
+      ]
+    }
+  ]
+}
