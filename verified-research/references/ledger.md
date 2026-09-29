@@ -20,7 +20,12 @@ components sum to the composite, so a reader sees exactly why a source ranks whe
 | **Corroboration** | 20 | *How well independent sources back it up* — a claim confirmed by 2+ unrelated sources is safer than a lone assertion | Independent sources confirming its key claim during verify: 0 → 0 · 1 → 10 · 2+ → 20 |
 | **Reuse** | 15 | *How often it keeps proving useful* — every later research that relies on it again lifts battle-tested sources to the top | +5 each time the source recurs in a *later* research and re-passes verify (cap 15). New sources start at 0 |
 
-`Score = Tier + Recency + Corroboration + Reuse`. A brand-new excellent academic source
+`Score = Tier + Recency + Corroboration + Reuse`. **Compute it with
+`python3 <skill>/scripts/score.py`** (stdin: one `name | url | tier | date | corroborations [| reuse]`
+line per source, or a JSON list with the same keys); it prints ready ledger rows plus a
+JSON copy. Do not compute scores by hand: hand arithmetic drifted by up to 10 points in
+past runs, and a practitioner site once received authoritative-tier points.
+A brand-new excellent academic source
 tops out at 85 (no reuse yet); reuse is what pushes proven sources to the top over time —
 this is how the list "manages itself."
 
