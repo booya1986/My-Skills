@@ -1,0 +1,29 @@
+{
+  "skill_name": "verified-research",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "do verified research on skills-based organizations for me. I lead training at a large logistics company and our HR director keeps saying we should organize around skills instead of job titles. I want to know what it actually means, who has done it, what broke, and whether there are examples from mid-sized regional companies like ours. Put the note in my research folder.",
+      "expected_output": "A note in NOTES_DIR with a jargon key, TL;DR, non-obvious insights with sourced numbers, at least one visual (table or mermaid), an honest limits section including any empty community tier stated explicitly, tiered clickable sources with dates and confidence, sources linked inline where named, and a do-not-cite table (e.g., the 70-20-10 figure handled per debunked-statistics.md). Source Ledger upserted with scores from scripts/score.py. The publish step offered in one line, not built.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I've been offered to lead a new 'learning data and AI' team alongside my current role at a mid-sized software company. Before I answer I want the research: what such teams do elsewhere, how they're structured and sized, what they get measured on, what usually goes wrong, and what I'm not seeing. Keep it generic, no company names, and put it in a new folder called Learning Data Team/.",
+      "expected_output": "Framing questions asked first (purpose, scope, output language and folder, employer link). Decision angles covered before delivery: mandate readings, stakeholder map, end-user view, alternatives to a new team, cost and promises, personal fit, pre-mortem, interview guide, KPI framework. Ratios explained with worked examples. New folder created, generic note with no employer detail, ledger updated with script-computed scores.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "what's the latest, checked, on EU AI Act obligations for employers using AI in hiring? dates matter, I need the current deadlines. English note please.",
+      "expected_output": "English note with exact dates cross-checked against 2+ independent trackers, prohibited practices vs high-risk (Annex III) obligations and any deferrals distinguished, vendor claims labeled as such, sources linked inline and in a tiered list with dates and confidence.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Take the verified note you just wrote on remote-work productivity and publish it as a nice shareable page with a couple of infographics. The note is in Arabic.",
+      "expected_output": "Follows references/publish.md: kit copied to a project folder outside the notes folder, build.py run with --lang ar --dir rtl, DESIGN.md filled in, components re-render note content without dropping any, top-down diagrams only, arrows point left in rows, real-browser screenshots at desktop and phone width with no horizontal scroll, GitHub Pages URL verified live and written into the note's frontmatter, local server stopped and screenshots removed.",
+      "files": []
+    }
+  ]
+}

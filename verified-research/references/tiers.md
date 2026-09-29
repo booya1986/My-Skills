@@ -54,29 +54,47 @@ both to be trustworthy AND current.
 
 ## Community fetch playbook (Reddit / X / HN)
 
-Plain `WebFetch` is bot-blocked by Reddit and X. Use the path that actually works per
-venue, and **always name a venue you couldn't reach** (no silent omission):
+Plain `WebFetch` is bot-blocked by Reddit and X. Use the route that actually works per
+venue, and **always name a venue you couldn't reach**: the point of the tier-balance
+rule is that an unstated gap reads as "covered".
 
-**Hacker News — rock solid, works everywhere (no auth).** Algolia API:
+**Reddit, with a Firecrawl MCP available: its search is the route.** Load the
+Firecrawl search tool (e.g. `firecrawl_search`; via ToolSearch if tools are deferred)
+and query `site:reddit.com/r/<sub> <terms>` with `sources: ["web"]`. It returns real
+thread titles, subreddit, upvote and comment counts and a highlight sentence. That is
+snippet level, and it is usually enough to corroborate practitioner patterns the formal
+tier cannot. Known dead ends at the time of writing: Firecrawl *scrape* refuses
+reddit.com, `WebFetch` and `.json` endpoints return 403, and `site:reddit.com` through
+plain `WebSearch` often returns nothing. Subagents are frequently not given MCP tools,
+so **the orchestrator runs this pass itself** after the lenses return and writes
+`ART/gathered-community-supplement.md`. Full threads need a server-side scraping actor
+(e.g., an Apify Reddit actor), when you have one.
+
+**Hacker News: reliable everywhere (no auth), thin for enterprise topics.** Algolia API:
 - Stories: `https://hn.algolia.com/api/v1/search?query=<q>&tags=story`
 - Comments: `...&tags=comment` · recency: `...&numericFilters=created_at_i>...`
-- `WebFetch` (or `curl`) this JSON directly — full titles, points, URLs, dates.
+- `WebFetch` (or `curl`) this JSON directly: full titles, points, URLs, dates.
 - Comment pages (`news.ycombinator.com/item?id=...`) rate-limit after a few fetches per
-  session — budget them.
+  session; budget them.
+- HN is genuinely empty on many organizational disciplines (HR, L&D, procurement…); two
+  or three variants returning nothing is a finding, not an access failure. What it does
+  carry is the receiving end: engineers and employees describing the tools they are
+  made to use.
 
-**X / Twitter** — usually needs a scraping API (Firecrawl scrape works on profile/post
-URLs). Without one: `WebSearch "site:x.com <query>"` (snippet-level).
+**X / Twitter:** `WebSearch "site:x.com <query>"` is snippet level and often ignores the
+site filter; a scraping API (e.g., Firecrawl scrape of a direct post URL) works. Low
+yield; do not spend more than two calls.
 
-**Reddit** — blocks direct fetches (403) including `.json`. Full threads need a
-server-side scraping actor (e.g., an Apify Reddit actor). Without one:
-`WebSearch "site:reddit.com/r/<sub> <query>"` (snippet-level).
+**Closed communities are a finding.** Most enterprise-function and niche local-market
+discourse lives in LinkedIn groups, private chat communities and paid conferences. When
+every open venue is empty in every relevant language, write `community: none found`
+once, state in the note that the knowledge sits with people, and add an interview guide
+(see references/decision-questions.md) instead of retrying.
 
-**No-shell environments:** subagents dispatched without Bash can't run local scraping
-helpers — the reliable community path is HN via the Algolia API over WebFetch, with
-site: WebSearch snippets as fallback. If 2–3 HN query variants return 0 relevant hits,
-record `"community: none found for <topic>"` and STOP — don't burn turns retrying; for
-org/enterprise topics the discourse usually lives in closed spaces (LinkedIn, industry
-events) and that thinness is itself a finding worth stating in the final note.
+**No-shell / no-MCP subagents:** the reliable path is HN via the Algolia API over
+WebFetch, with `site:reddit.com` / `site:x.com` WebSearch snippets as fallback. If 2–3
+query variants return 0 relevant hits, record `"community: none found for <topic>"` and
+STOP; don't burn turns retrying.
 
-**Rule:** the community tier is *satisfied* if HN OR Reddit OR X yields real signal — but
+**Rule:** the community tier is *satisfied* if HN OR Reddit OR X yields real signal, but
 every venue you tried and couldn't reach must be named explicitly in the discover output.

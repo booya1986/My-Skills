@@ -11,8 +11,8 @@ whatever ranked first — SEO farms, vendor marketing, stale numbers, and claims
 checked. This skill replaces that with a chain:
 
 ```
-decode → discover → gather → verify → critic → consolidate
-  map      find       read     attack    judge      write
+decode → discover → gather → verify → critic → consolidate → publish (optional)
+  map      find       read     attack    judge      write        share
 ```
 
 The two steps that do the heavy lifting:
@@ -37,6 +37,19 @@ The two steps that do the heavy lifting:
    keep re-passing verification rise via the Reuse bonus — over time you accumulate a
    battle-tested source list per domain.
 3. **A venue map** that remembers where the good sources live per domain, and grows.
+4. **A debunked-statistics list** that grows too: famous numbers that failed
+   fact-checking, each with a verified replacement, so they are never chased twice.
+5. **Optionally, a designed HTML report**: when you say yes, the note becomes a
+   standalone editorial page (floating contents, interactive components, infographics,
+   left-to-right or right-to-left) on GitHub Pages, with a `DESIGN.md` contract.
+
+### Decision-shaped questions
+
+Ask "should I take / build / buy X?" and the skill asks a few framing questions first,
+then covers the angles a "what is X" report misses: the readings of the mandate, who
+wins and loses, the end user's view, alternatives to doing it at all, cost and the
+promises you'll be measured on, personal fit, a pre-mortem, an interview guide, and a
+measurement framework.
 
 ## Install
 
@@ -53,29 +66,54 @@ Set your paths once (notes folder, ledger location) — see the Setup table in `
 - **Tier balance is enforced**: every topic must include both formal sources
   (regulators, analysts, academia) and community signal (HN/Reddit/X) — and when a tier
   is genuinely empty, the note says so instead of silently looking "covered".
-- **No bare citations**: every source is a link + date + confidence tag.
+- **No bare citations**: every source is a link + date + confidence tag, both in the
+  sources list and inline where the text names it.
+- **Every number carries who/when/sample**; untraceable famous statistics go to a
+  do-not-cite table with what to say instead.
+- **Scores come from a script** (`scripts/score.py`), not from an agent's arithmetic.
+- **Readable, native voice**: the note is written the way a native speaker of its
+  language would explain it out loud, with a read-aloud test on every section.
 - **Computed metrics get audited**: any X-per-Y ratio is traced to both inputs, the
   arithmetic is checked, and the figure is labeled reported-vs-computed.
 - **Field-tested failure guards**: gather agents write output incrementally (a partial
   file beats a dead agent), parallel agents never co-write shared files, and community
-  scraping has a documented fallback chain for environments without shell access.
+  scraping has a documented fallback chain (including a Firecrawl route for Reddit) for
+  environments without shell access.
 
 ## Files
 
 ```
 verified-research/
-├── SKILL.md               The pipeline: chain, setup, hard rules
-├── README.md              You are here
-└── references/
-    ├── steps.md           Per-step role prompts (decode → consolidate)
-    ├── tiers.md           Source tiers, venue map, community fetch playbook
-    └── ledger.md          Score rubric + Source Ledger schema + upsert protocol
+├── SKILL.md                    The pipeline: chain, setup, hard rules
+├── README.md                   You are here
+├── CHANGELOG.md                What changed, by date
+├── references/
+│   ├── steps.md                Per-step role prompts (decode → consolidate → publish)
+│   ├── tiers.md                Source tiers, venue map, community fetch playbook
+│   ├── ledger.md               Score rubric + Source Ledger schema + upsert protocol
+│   ├── decision-questions.md   The nine angles for decision-shaped questions
+│   ├── debunked-statistics.md  Famous numbers that failed fact-checking + replacements
+│   ├── writing-voice.md        How to write the note like a native speaker
+│   └── publish.md              Optional designed HTML report on GitHub Pages
+├── scripts/
+│   └── score.py                Computes ledger scores and prints ready rows
+├── assets/publish-kit/         build.py, components.py, template.html, DESIGN.md,
+│                               style-reference.png (copied per report)
+└── evals/evals.json            Test prompts with expected behavior
+```
+
+Quick check of the scorer:
+
+```bash
+printf 'Example paper | https://example.org/paper | academic | 2026-06-01 | 2\n' \
+  | python3 verified-research/scripts/score.py
 ```
 
 ## Origin
 
-Extracted from a personal AI-assistant project where it runs as a 6-step multi-agent
-pipeline. Battle-tested on real research runs (deep-dives into AI-era banking
-transformation, TTS engine selection, token-economics — each 60–125 scored sources,
-2–3 rounds). The lessons those runs taught (turn-budget guards, primary-source flag
-checks, do-not-cite lists, computed-metric audits) are baked into the step specs.
+Extracted from a personal AI-assistant project where it runs as a multi-agent pipeline.
+Battle-tested on real research runs (deep-dives into AI-era industry transformation, TTS
+engine selection, token economics, and organizational decisions — each 60–125 scored
+sources, 2–3 rounds). The lessons those runs taught (turn-budget guards, primary-source
+flag checks, do-not-cite lists, computed-metric audits, decision angles, readable voice)
+are baked into the step specs. See `CHANGELOG.md` for what changed when.
