@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Create a ready-to-edit reel project with everything the template needs.
-#   bash setup_project.sh reel-<slug> [script-family]
-#   script-family: Google Fonts family for chips/headlines, default "Noto Sans Hebrew"
-#                  (use "Noto Sans" for Latin-only, "Noto Sans Arabic", ...)
-#   Style B: run it, then `cp $SK/assets/style-b/reference-build.py <dir>/build.py && python3 build.py`, then run it
-#   again so the fonts the new index.html references are fetched.
+#   bash setup_project.sh reel-<slug> [script-family] [a|b]
+#   script-family: Google Fonts family for ALL text, default "Noto Sans Hebrew"
+#                  (use "Noto Sans" for Latin-only, "Noto Sans Arabic", ...). One family only, no mono/serif.
+#   style b: also installs assets/style-b/reference-build.py as build.py + kit.css, builds index.html once,
+#            and fetches the fonts it references, all in this single run.
 # Result: index.html (the approved composition), gsap.min.js, fonts/, media/sfx/, media/paper_grain.png,
 # media/logos/, package.json with a pinned hyperframes. Re-running is safe: existing files are kept.
 set -euo pipefail
-DIR="$1"; FAMILY="${2:-Noto Sans Hebrew}"
+DIR="$1"; FAMILY="${2:-Noto Sans Hebrew}"; STYLE="${3:-a}"
 SK="$(cd "$(dirname "$0")/.." && pwd)"
 UA="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/124 Safari/537.36"
 need() { command -v "$1" >/dev/null || { echo "missing dependency: $1 ($2)" >&2; exit 1; }; }
@@ -16,7 +16,13 @@ need ffmpeg "brew install ffmpeg"; need python3 "install Python 3"; need npx "in
 python3 -c "import numpy, PIL" 2>/dev/null || { echo "missing python packages: pip install numpy Pillow" >&2; exit 1; }
 
 mkdir -p "$DIR/fonts" "$DIR/media/sfx" "$DIR/media/logos"
-[ -f "$DIR/index.html" ] || cp "$SK/assets/reference-composition.html" "$DIR/index.html"
+if [ "$STYLE" = b ]; then
+  [ -f "$DIR/build.py" ] || cp "$SK/assets/style-b/reference-build.py" "$DIR/build.py"
+  [ -f "$DIR/kit.css" ] || cp "$SK/assets/style-b/kit.css" "$DIR/kit.css"
+  [ -f "$DIR/index.html" ] || (cd "$DIR" && python3 build.py >/dev/null)
+else
+  [ -f "$DIR/index.html" ] || cp "$SK/assets/reference-composition.html" "$DIR/index.html"
+fi
 
 # HyperFrames project files (pinned so renders are reproducible)
 if [ ! -f "$DIR/package.json" ]; then
@@ -44,10 +50,7 @@ for f in $(grep -o 'fonts/[A-Za-z0-9_-]*\.woff2' "$DIR/index.html" | sort -u); d
   out="$DIR/$f"; [ -f "$out" ] && continue
   [ -f "$SK/assets/scaffold/$f" ] && { cp "$SK/assets/scaffold/$f" "$out"; continue; }
   case "$f" in
-    *JetBrainsMono-400*) fetch_subset "JetBrains Mono" 400 latin "$out" ;;
-    *JetBrainsMono-700*) fetch_subset "JetBrains Mono" 700 latin "$out" ;;
-    *FrankRuhl-hebrew*)  fetch_subset "Frank Ruhl Libre" 400 hebrew "$out" ;;
-    *FrankRuhl-latin*)   fetch_subset "Frank Ruhl Libre" 400 latin "$out" ;;
+    *JetBrainsMono*|*FrankRuhl*) echo "ERROR: $f referenced; the user wants ONE font family (Noto). Swap it to 'NSH'." >&2; exit 1 ;;
     *-latin*)            fetch_subset "$FAMILY" "300..900" latin "$out" || fetch_subset "$FAMILY" 800 latin "$out" ;;
     *)                   sub=$(echo "$FAMILY" | awk '{print tolower($NF)}'); [ "$sub" = sans ] && sub=latin
                          fetch_subset "$FAMILY" "300..900" "$sub" "$out" || fetch_subset "$FAMILY" 800 "$sub" "$out" ;;

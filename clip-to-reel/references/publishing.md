@@ -1,0 +1,108 @@
+# Publishing gate (step 8) — only after the user says yes
+
+Publishing is outward-facing and can't be taken back. Never publish as part of "make a reel". After delivery, ask
+once which networks to publish to (multi-select, plus "not now"), draft the texts, show them, and publish only
+after an explicit yes. The notes below come from one reel published to Instagram, a Facebook page, a personal
+Facebook profile, LinkedIn, X, TikTok and YouTube Shorts in a single session, driving the user's own logged-in
+browser (a browser-extension tool such as Claude in Chrome; a fresh automation browser has no sessions).
+
+## 0 · Files to have ready (built in step 7)
+
+| File | For |
+|---|---|
+| `<slug>_9x16_upload.mp4` | every network except YouTube. Two-pass H.264 ~1200k + AAC 128k → under 10 MB (browser-extension uploads are often capped at 10 MB). |
+| `<slug>-yt_9x16_upload.mp4` | YouTube Shorts, when the Short should drive to a full video. |
+| `posts.txt` in the project | the approved texts, one block per network. |
+
+**Full-video variant:** copy the project and change only the three CTA strings in `index.html` (don't re-run
+`build.py` there): the sign word → "FULL VIDEO", the chip → "on my channel", the sub-chip → "tap the link above my
+name". Render and loudnorm it like the main reel.
+
+## 1 · Texts
+
+Write ONE base text (three short lines: what it is → why it matters → what it concretely is), have it proof-read
+for natural phrasing in the target language, then add a per-network last line. Avoid emoji if a composer can't
+type them. Same hashtags everywhere (+ `#shorts` on YouTube).
+
+| Network | Last line / link | UTM on every link to your site |
+|---|---|---|
+| Instagram + Facebook page | "Comment KEYWORD and I'll send you …" (only if a comment→DM automation exists) | the automation's DM link: `utm_source=meta&utm_medium=dm&utm_campaign=<automation>` |
+| TikTok | "link in bio" (links in TikTok captions aren't clickable) | tag the bio link once |
+| LinkedIn | "link in the first comment" + a first comment with the link | `utm_source=linkedin&utm_medium=social&utm_campaign=<slug>` |
+| Facebook profile | link in the body AND in the first comment | `utm_source=facebook&utm_medium=social&utm_campaign=<slug>` |
+| X | a short version (≤ ~200 chars) with the link in the post | `utm_source=x&utm_medium=social&utm_campaign=<slug>` |
+| YouTube Shorts | **no site link at all**; drive to the full video (§7) | — |
+
+Put the link on its own line after a short label: a URL inside a right-to-left sentence scrambles the line.
+Tag links BEFORE posting: X posts can't be edited without a paid plan, and untagged social traffic can't be
+attributed to a post afterwards. If your analytics split "own" vs "stranger" traffic by `utm_source`, make sure
+the sources you use here are in its list.
+
+## 2 · Before any upload
+
+- The tab must be visible: `document.visibilityState === 'visible'`. Automation tabs often open hidden; pages
+  then render squashed and some composers post WITHOUT the video. Bring the tab to the front first (on macOS:
+  `osascript` → set the window's active tab index + activate).
+- File inputs: never click a real file input (it opens a native picker you can't drive). Hook
+  `HTMLInputElement.prototype.click` to capture the input the page creates, give it an `aria-label`, find it by
+  that label, then use the upload tool on it.
+- Before typing, confirm `document.activeElement` is the intended box. Some sites have single-key shortcuts
+  (`/` jumps to search on X; letters open dialogs on Facebook).
+
+## 3 · Instagram + Facebook page (Meta Business Suite reels composer)
+
+1. Type the caption FIRST in a fresh tab with real keystrokes: shift+Return between lines, Escape after each
+   hashtag. Don't use `execCommand` there (a Draft.js editor; the details section can vanish).
+2. Hook + "Add video" → upload → wait for 100 %.
+3. Next (edit step, leave it) → Next (share step): **turn off auto-captions** when captions are burned in, leave the
+   story toggle off, "Share now" → Share → close the processing dialog.
+4. Verify on the profile's reels grid that the newest reel carries this caption (other sessions may post too).
+
+## 4 · TikTok (TikTok Studio upload page)
+
+Ignore any "continue editing an unsaved video?" banner; it may belong to someone else's session. Label
+`input[type=file]` via JS → upload → click the description, select all, delete, type the text → find the Post
+button → click by reference. The post shows "only me / under review" until the platform's review ends.
+
+## 5 · LinkedIn
+
+Open the share composer, click the editor by reference, type the text (hashtags as one string ending in a space).
+**Never press Escape** (it closes the composer). Hook + media icon → upload → Next → Post, and wait until
+"Posting…" ends. First comment: open your recent activity, Comment on the top post, paste the link lines, Comment.
+The link-preview card under the comment is generated by LinkedIn and keeps the untagged URL.
+
+## 6 · Facebook personal profile
+
+Profile page → hook → "Photo/video" → upload → click the text area, confirm focus, type (text + link line) → Post.
+Reload after ~20 s and confirm the video plays inside the post. First comment: the post may open as a reel view;
+confirm the focused box is the comment box before typing. Long URLs display truncated, so verify the anchor's
+href, not its text. Posts and comments can be edited later (post menu → Edit post; comment menu → Edit).
+
+## 7 · YouTube Shorts: the highest-converting setup
+
+A Short should drive to the full video, not to your site:
+1. **Related-video chip** = the full video. It's the only clickable link inside the Shorts player, right above the
+   channel name, exactly where the variant's CTA points. Set it on the video's edit page in YouTube Studio →
+   "Related video" → click the full video's card **by coordinate** (clicking the list option by reference silently
+   saved "None"). Verify on the public `/shorts/<id>` page that a link to `/watch?v=<full>` exists.
+2. **Description:** base text + "the chapter on <topic> starts at mm:ss" + `https://youtu.be/<full>?t=<seconds>`.
+3. **Pinned comment** with the same `?t=` chapter link (post it, then ⋮ → Pin → Pin).
+
+Upload dialog: fill title and description via JS in `ytcp-uploads-dialog #textbox` (boxes[0] = title, [1] =
+description: focus, select the contents with a Range, `execCommand('delete')`, then `insertText` per line with
+`insertLineBreak`), and read the result back by length or `includes()`. Close the hashtag suggestion popup by
+clicking a heading, because **Escape closes the whole upload dialog**. Choose "not made for kids" → Visibility step →
+Public → click `#done-button` via JS.
+
+## 8 · X
+
+Open the compose dialog. Label the file input **inside** `[role=dialog]` (the timeline behind it has another one) →
+upload → click the text box by reference → type. The ring next to the Post button is the character counter, not
+upload progress. Posts can't be edited on a free plan, so check every link before posting. To add a missing link,
+reply to your own post: click the reply box by coordinate, confirm `activeElement` is the tweet textarea, type,
+then click the inline reply button; dismiss any upsell dialog.
+
+## 9 · Report
+
+One table: network → post URL → link / UTM → anything still pending (platform review, video processing). Close every
+tab you opened, one at a time, and write the URLs into your notes for this reel.

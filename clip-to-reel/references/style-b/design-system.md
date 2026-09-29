@@ -27,7 +27,7 @@ Rules: no UI stretch longer than ~5 s without an overlay or burst; first cut by 
 
 ## Captions
 Single row at `top:1572` (just above the small card). Chip: `rgba(30,30,30,.92)`, radius 6, padding 4/20,
-Noto Sans Hebrew 500, 46 px, white. 1–3 words by meaning. Latin/commands in JetBrains Mono inside `.ltr`.
+Same sans family, 500, 42–46 px, white. 1–3 words by meaning. Latin/commands inside `.ltr` isolating spans, still in the same family. With the LARGE face card (sharp full-frame source, 964×602 anchored to the bottom edge, top corners rounded) the caption row moves above the card (`#capCard{top:1226px}`), never onto the face.
 
 ## Collage generation (Higgsfield)
 - Image: `gpt_image_2_5`, 9:16, 1 credit. Prompt skeleton: "Vintage editorial paper-cut collage, Vox explainer
@@ -46,12 +46,12 @@ Noto Sans Hebrew 500, 46 px, white. 1–3 words by meaning. Latin/commands in Je
   magnifier on a blueprint = scanning the project; doctor = /doctor).
 
 ## UI kit (in the reference build)
-`.win` white window (radius 30, traffic lights, mono title), `.dwin` dark window, `.chat` bar (typed text with
-`steps()` clip-path, brand-colour send button that presses), `.greet` serif line (Frank Ruhl Libre) with the
+`.win` white window (radius 30, traffic lights, small grey title), `.dwin` dark window, `.chat` bar (typed text with
+`steps()` clip-path, brand-colour send button that presses), `.greet` heading line (same sans family, 700, never a serif) with the
 Claude logo, `.md` doc (headings, highlighted bullet, grey line placeholders, scrolls inside a clipped body under
 the title bar), `.fcard` label cards with a brand ring, `.pill` "Generating" with a moving gradient, `.cursor`,
 `.folder` in brand colour with the logo in white, `.ok` green check (SVG, not a ✓ glyph).
 
 ## Audio
-Voice 1.0, bed 0.16 (0.40 under the CTA), whoosh 0.32 on every cut, click 0.55 on UI actions, tick 0.45 on every
+Voice 1.0, bed 0.16 (0.40 under the CTA), whoosh only on mode changes (UI↔collage↔burst↔face↔CTA, ~8 per reel; one on every cut and punch-in felt like too much), click 0.55 on UI actions, tick 0.45 on every
 burst shot, boom under the CTA. Integrated −14 ±0.7 LUFS.

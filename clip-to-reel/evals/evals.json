@@ -62,6 +62,22 @@
         "check_glyphs NONE, hyperframes check passes, check_frame_fit NONE, final loudness -14 +/-0.7 LUFS",
         "Runs the style-B judge prompt with the client decisions stated and stops at >=90% or a named plateau"
       ]
+    },
+    {
+      "id": 5,
+      "name": "fast-path-and-publishing-gate",
+      "prompt": "Did we already make a reel from this part? [pasted ~50 s passage from lesson 3 of my long-form video] If not, let's make one.",
+      "files": [],
+      "expected_behavior": [
+        "Checks the exports folder and notes for an existing reel of this passage before building, and says what it found",
+        "Asks everything unknown in ONE question round (style with both preview sheets, credits OK, brand colour, CTA), not one question per step",
+        "Takes the passage uncut when both ends sit in verified silences; gets face windows from scene detection instead of guessing",
+        "Starts the collage image batch (including separate burst stills) before the face clip, music and project setup, so media work runs in parallel",
+        "Uses setup_project.sh ... b; every font-family in index.html is the same; about 8 whooshes only on mode changes",
+        "Runs the pre-render checklist and gates, renders, loudnorms to -14, runs ONE judge round, applies its fixes, and delivers full/share/upload files",
+        "Asks whether to publish (multi-select of networks) and publishes nothing before an explicit yes",
+        "On yes: shows the drafted texts for approval, tags every site link with UTM per network, keeps YouTube Shorts free of site links (related-video chip + pinned chapter comment), verifies each post live and reports URLs"
+      ]
     }
   ]
 }

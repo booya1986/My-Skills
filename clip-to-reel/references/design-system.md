@@ -21,8 +21,8 @@ Decisions baked into the approved look (they override the reference): the CTA wo
 
 - Paper `#F2DFBC` + `media/paper_grain.png` overlay; studio `radial-gradient(#fff → #f2f2f0 40% → #dededa)`;
   dark `#050505`; accent orange `#E4643A`, text-safe rust `#B84A26`; ink `#1c1a17`; green check `#22C55E`.
-- Fonts: Noto Sans Hebrew (`NSH`, 800–900 for chips and headlines; its latin subset covers English chips too),
-  JetBrains Mono (`JB`) for UI text. Only the embedded subsets exist — no emoji, arrows or ✓ glyphs; draw them as
+- Fonts: ONE family for everything (default Noto Sans for your script, `NSH` in the template): 800–900 for chips
+  and headlines, 400–700 for UI text and code. No mono or serif; mixed families read as unfinished. Only the embedded subsets exist — no emoji, arrows or ✓ glyphs; draw them as
   inline SVG. For another script, add that language's Noto Sans subset and extend `check_glyphs.py` RANGES.
 - Direction: Hebrew/Arabic → `direction:rtl` chips, dotted links and flows move right→left; otherwise LTR.
 

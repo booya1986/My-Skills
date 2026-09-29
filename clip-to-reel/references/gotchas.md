@@ -89,3 +89,25 @@
   the UI fixed it); don't reuse the CTA plate in a burst; split chips longer than ~1.2 s.
 - **Style B scores on an 81 s test reel:** 65 → 81 → 79 → 80 → 84 → 83 → 85 → 84. The ceiling was the small, soft
   face and the absence of a face in a third of the source.
+
+## Learned on a 56 s style-B build (sharp full-frame face, then published to six networks)
+- **One font family.** Mono code text and a serif greeting next to the sans chips were rejected mid-build. Both
+  templates are single-family now and `setup_project.sh` refuses JetBrains Mono / Frank Ruhl. Grep the built
+  index.html before every render: every `font-family` should be the same.
+- **Whooshes:** one on every cut and punch-in (20 in 56 s) was "too much". ~8, only on mode changes, at 0.6.
+  Judges keep asking for "SFX on every cut" and louder SFX; follow the viewer, not the rubric.
+- **Large face card:** captions placed on the card covered the mouth/beard even low on the card. Keep the caption
+  row above the card. A card anchored to the bottom edge with only the top corners rounded reads better.
+- **Collage likeness:** a prompt naming a famous film character produced a recognisable actor. Regenerate as an
+  anonymous figure seen from behind; the reference still lands and nothing impersonates a real person.
+- **Higgsfield:** a 5 s 1080p seedance_2_5 animation cost ~58–60 credits (not 45). Batch items can come back as a
+  preset recommendation instead of a job; resubmit with `declined_preset_id`. When several sessions share an
+  account, report this reel's own spend, not just the balance delta.
+- **Judge rounds** went 75 → 78 → 75 (noise). Bake the recurring asks into the pre-render checklist in SKILL.md
+  (a long white-UI hold, fresh burst stills, no English letter-spaced labels, motion in every hold) and run one round.
+- **Late elements** that rise from opacity 0.6 show faintly before their cue. Start from 0.
+- **RTL pill with an icon on the left:** the text ran into the icon; give that side ≥ 120 px padding.
+- **Dense layout check:** the face video's push-in inside the clipped card reports `container_overflow`; mark the
+  face `<video>` with `data-layout-allow-overflow`.
+- **Parallel sessions** may create reels with the same number prefix at the same time. List the folder before
+  naming, and never touch another session's drafts or files.
