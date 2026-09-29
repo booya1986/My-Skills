@@ -8,15 +8,12 @@
 <style>
   @font-face { font-family:'NSH'; font-weight:300 900; src:url('fonts/NotoSans-script.woff2') format('woff2'); unicode-range:U+0590-05FF,U+FB1D-FB4F; }
   @font-face { font-family:'NSH'; font-weight:300 900; src:url('fonts/NotoSans-latin.woff2') format('woff2'); unicode-range:U+0000-00FF,U+2000-206F; }
-  @font-face { font-family:'JB'; font-weight:400; src:url('fonts/JetBrainsMono-400.woff2') format('woff2'); }
-  @font-face { font-family:'JB'; font-weight:700; src:url('fonts/JetBrainsMono-700.woff2') format('woff2'); }
-
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
   html,body{width:1080px;height:1920px;overflow:hidden;background:#0b0b0c}
   body{font-family:'NSH',sans-serif;color:#fff}
   #root{position:relative;width:1080px;height:1920px;overflow:hidden;background:#0b0b0c}
   .ltr{direction:ltr;unicode-bidi:isolate}
-  .mono{font-family:'JB',ui-monospace,Menlo,monospace}
+  .mono{font-family:'NSH',ui-monospace,Menlo,monospace}
 
   /* ---------- footage ---------- */
   .half{position:absolute;left:0;top:954px;width:1080px;height:966px;overflow:hidden;z-index:1}
@@ -42,7 +39,7 @@
   .tIcon{position:absolute;width:236px;height:236px;border-radius:54px;
     background:linear-gradient(160deg,#3a3a3c 0%,#141416 58%,#070708 100%);
     box-shadow:0 22px 50px rgba(60,40,10,.35),inset 0 2px 0 rgba(255,255,255,.18)}
-  .tIcon span{position:absolute;left:34px;top:40px;font-family:'JB',monospace;font-weight:700;
+  .tIcon span{position:absolute;left:34px;top:40px;font-family:'NSH',sans-serif;font-weight:700;
     font-size:104px;line-height:120px;color:#f5f5f5;direction:ltr}
   .tIcon i{position:absolute;left:0;right:0;top:0;height:40px;border-radius:54px 54px 0 0;background:rgba(255,255,255,.05)}
 
@@ -54,16 +51,16 @@
   .winBar i:nth-child(1){left:26px;background:#FF5F57} .winBar i:nth-child(2){left:58px;background:#FEBC2E}
   .winBar i:nth-child(3){left:90px;background:#28C840}
   .winBar .wt{position:absolute;left:0;right:0;top:0;height:64px;line-height:64px;text-align:center;
-    font-family:'JB',monospace;font-size:24px;color:#6b6b67;direction:ltr}
-  .ln{position:relative;font-family:'JB',monospace;font-size:40px;line-height:62px;height:62px;
+    font-family:'NSH',sans-serif;font-size:24px;color:#6b6b67;direction:ltr}
+  .ln{position:relative;font-family:'NSH',sans-serif;font-size:40px;line-height:62px;height:62px;
     color:#2a2a28;direction:ltr;white-space:nowrap;padding-left:40px}
   .ln .p{color:#6b6b67} .ln .g{color:#1f8a4c}
   .hl{position:absolute;left:28px;top:12px;height:40px;width:0;background:rgba(232,90,50,.28);border-radius:6px}
-  .tag{position:absolute;left:0;right:0;height:40px;text-align:center;font-family:'JB',monospace;font-size:28px;
+  .tag{position:absolute;left:0;right:0;height:40px;text-align:center;font-family:'NSH',sans-serif;font-size:28px;
     line-height:40px;letter-spacing:12px;color:#77776f;direction:ltr}
   .folder{position:absolute}
   .folder svg{display:block;width:100%;height:auto}
-  .folder .fl{position:absolute;left:-60px;right:-60px;text-align:center;font-family:'JB',monospace;
+  .folder .fl{position:absolute;left:-60px;right:-60px;text-align:center;font-family:'NSH',sans-serif;
     font-weight:700;font-size:48px;line-height:64px;height:64px;color:#2a241c;direction:ltr}
   .check{position:absolute;width:120px;height:120px}
   .check svg{width:120px;height:120px;display:block}
@@ -73,7 +70,7 @@
   /* s1 · three beats on paper */
   #s1Icon{left:422px;top:300px}
   #s1WordWrap{position:absolute;left:0;right:0;top:360px;height:170px;display:flex;justify-content:center}
-  #s1Word{position:relative;font-family:'JB',monospace;font-weight:700;font-size:132px;line-height:170px;
+  #s1Word{position:relative;font-family:'NSH',sans-serif;font-weight:700;font-size:132px;line-height:170px;
     height:170px;color:#1c1a17;direction:ltr;letter-spacing:-2px}
   .sel{position:absolute;left:-26px;right:-26px;top:10px;bottom:10px;border:3px solid rgba(40,34,26,.55)}
   .sel b{position:absolute;width:18px;height:18px;background:#F2DFBC;border:3px solid rgba(40,34,26,.7)}
@@ -117,7 +114,7 @@
   /* s5 · Finder home */
   #s5Fin{left:70px;top:470px;width:940px;height:600px}
   #s5Side{position:absolute;left:0;top:64px;width:250px;bottom:0;background:#f1f1ef;border-right:2px solid rgba(0,0,0,.06);padding-top:24px}
-  .sb{height:62px;line-height:62px;padding-left:34px;font-family:'JB',monospace;font-size:30px;color:#4a4a46;direction:ltr}
+  .sb{height:62px;line-height:62px;padding-left:34px;font-family:'NSH',sans-serif;font-size:30px;color:#4a4a46;direction:ltr}
   .sb.on{background:rgba(60,140,230,.14);color:#1d5fae;font-weight:700}
   #s5Grid{position:absolute;left:250px;top:64px;right:0;bottom:0}
   #s5f1{left:30px;top:130px} #s5f2{left:245px;top:130px} #s5f3{left:460px;top:130px}
@@ -126,7 +123,7 @@
   /* s6 · dark terminal */
   #s6Prompt{position:absolute;left:90px;top:640px;height:60px;font-size:44px;line-height:60px;color:#8a8a85;direction:ltr;white-space:nowrap}
   #s6CmdWrap{position:absolute;left:90px;top:720px;height:170px;direction:ltr;white-space:nowrap}
-  #s6Cmd{display:inline-block;font-family:'JB',monospace;font-weight:700;font-size:118px;line-height:170px;height:170px;color:#E4643A;
+  #s6Cmd{display:inline-block;font-family:'NSH',sans-serif;font-weight:700;font-size:118px;line-height:170px;height:170px;color:#E4643A;
     text-shadow:0 0 34px rgba(228,100,58,.55)}
   #s6Cur{display:inline-block;width:58px;height:114px;background:#E4643A;vertical-align:-14px;margin-left:12px;
     box-shadow:0 0 30px rgba(228,100,58,.6)}
@@ -134,7 +131,7 @@
   #s6Cur2{display:inline-block;width:24px;height:42px;background:#4ADE80;vertical-align:-8px;margin-left:10px}
   #s6Path{position:absolute;left:90px;top:1030px;height:64px;direction:ltr;white-space:nowrap}
   #s6Path span{display:inline-block;height:64px;line-height:64px;padding:0 26px;border-radius:32px;margin-right:18px;
-    font-family:'JB',monospace;font-weight:700;font-size:36px}
+    font-family:'NSH',sans-serif;font-weight:700;font-size:36px}
   #s6P1{background:rgba(255,255,255,.10);color:#cfcfca}
   #s6P2{background:rgba(228,100,58,.22);color:#FF9B73;border:2px solid rgba(228,100,58,.6)}
   #s6Pix{position:absolute;left:90px;top:300px;width:440px;height:280px;filter:drop-shadow(0 0 22px rgba(228,100,58,.45))}
@@ -148,7 +145,7 @@
   #s6bWin{left:110px;top:540px;width:860px;height:300px}
   #s6bBody{padding-top:34px}
   #s6bCrumb{position:absolute;left:0;right:0;top:920px;height:72px;display:flex;justify-content:center;direction:ltr}
-  #s6bCrumb span{display:inline-block;height:72px;line-height:72px;padding:0 30px;border-radius:36px;margin:0 10px;font-family:'JB',monospace;font-weight:700;font-size:42px}
+  #s6bCrumb span{display:inline-block;height:72px;line-height:72px;padding:0 30px;border-radius:36px;margin:0 10px;font-family:'NSH',sans-serif;font-weight:700;font-size:42px}
   #s6bC1{background:rgba(0,0,0,.08);color:#3a3a36}
   #s6bC2{background:#C2552E;color:#fff}
 
@@ -159,10 +156,10 @@
   #s7PathWrap{position:absolute;left:420px;top:276px;width:240px;height:40px}
   #s7Path{width:240px;height:40px;display:block}
   #s7Pill{position:absolute;left:470px;top:180px;width:140px;height:64px;border-radius:32px;background:#E4643A;
-    color:#fff;font-family:'JB',monospace;font-weight:700;font-size:40px;line-height:64px;text-align:center;direction:ltr;
+    color:#fff;font-family:'NSH',sans-serif;font-weight:700;font-size:40px;line-height:64px;text-align:center;direction:ltr;
     box-shadow:0 12px 26px rgba(160,70,30,.35)}
   #s7Cap{position:absolute;left:0;right:0;top:600px;height:80px;text-align:center;direction:ltr;
-    font-family:'JB',monospace;font-weight:700;font-size:62px;line-height:80px;color:#2a241c}
+    font-family:'NSH',sans-serif;font-weight:700;font-size:62px;line-height:80px;color:#2a241c}
   #s7Cap b{color:#B84A26}
 
   /* s9 · split · arrived in Documents */
@@ -171,25 +168,25 @@
   #s9Check{left:630px;top:170px}
   #s9Crumb{position:absolute;left:0;right:0;top:640px;height:64px;display:flex;justify-content:center;direction:ltr}
   #s9Crumb span{display:inline-block;height:64px;line-height:64px;padding:0 28px;border-radius:32px;margin:0 8px;
-    font-family:'JB',monospace;font-weight:700;font-size:38px}
+    font-family:'NSH',sans-serif;font-weight:700;font-size:38px}
   #s9C1{background:rgba(40,34,26,.10);color:#4a4238}
   #s9C2{background:#E4643A;color:#fff}
 
   /* s10 */
   #s10Tag{top:520px}
   #s10Word{position:absolute;left:0;right:0;top:620px;height:360px;display:flex;justify-content:center;direction:ltr}
-  #s10Word span{display:inline-block;font-family:'JB',monospace;font-weight:700;font-size:300px;line-height:360px;height:360px;color:#1d1d1b;overflow:hidden}
+  #s10Word span{display:inline-block;font-family:'NSH',sans-serif;font-weight:700;font-size:300px;line-height:360px;height:360px;color:#1d1d1b;overflow:hidden}
   #s10Line{position:absolute;left:250px;top:1000px;width:580px;height:10px;border-radius:5px;background:#E4643A;transform-origin:left center}
 
   /* s11a · split ls */
   #s11aPill{position:absolute;left:440px;top:170px;width:200px;height:90px;border-radius:45px;background:#1c1a17;color:#fff;
-    font-family:'JB',monospace;font-weight:700;font-size:56px;line-height:90px;text-align:center;direction:ltr}
+    font-family:'NSH',sans-serif;font-weight:700;font-size:56px;line-height:90px;text-align:center;direction:ltr}
   #s11aF1{left:740px;top:380px;width:220px} #s11aF2{left:430px;top:380px;width:220px} #s11aF3{left:120px;top:380px;width:220px}
   #s11aF1 .fl,#s11aF2 .fl,#s11aF3 .fl{top:190px;font-size:40px}
 
   /* s11 */
   #s11Win{left:90px;top:330px;width:900px;height:800px}
-  #s11Cmd{height:74px;line-height:74px;padding-left:36px;font-family:'JB',monospace;font-size:34px;color:#2a2a28;
+  #s11Cmd{height:74px;line-height:74px;padding-left:36px;font-family:'NSH',sans-serif;font-size:34px;color:#2a2a28;
     direction:ltr;border-bottom:2px solid rgba(0,0,0,.06);background:#f6f6f4;white-space:nowrap}
   #s11Cmd{position:relative}
   #s11CmdHl{left:20px;top:17px}
@@ -198,7 +195,7 @@
   #s11Grid{position:relative;height:660px}
   .gf{position:absolute;width:200px}
   .gf svg{display:block;width:200px;height:auto}
-  .gf .fl{position:absolute;left:-40px;right:-40px;top:168px;text-align:center;font-family:'JB',monospace;font-weight:700;
+  .gf .fl{position:absolute;left:-40px;right:-40px;top:168px;text-align:center;font-family:'NSH',sans-serif;font-weight:700;
     font-size:32px;line-height:44px;height:44px;color:#3a3a36;direction:ltr}
   #gf1{left:620px;top:60px} #gf2{left:350px;top:60px} #gf3{left:80px;top:60px}
   #gf4{left:620px;top:360px} #gf5{left:350px;top:360px} #gf6{left:80px;top:360px}
