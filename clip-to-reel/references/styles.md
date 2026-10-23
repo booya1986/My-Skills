@@ -1,7 +1,7 @@
 # Choosing a style (step 0 — always ask)
 
-Show the user this table and the two preview sheets, then ask which style this reel uses. Never pick for them.
-Preview sheets: `assets/target-look-scenes.jpg` (A) and `assets/style-b/target-look.jpg` (B).
+Show the user this table and the preview sheets, then ask which style this reel uses. Never pick for them.
+Preview sheets: `assets/target-look-scenes.jpg` (A) and `assets/style-b/target-look.jpg` (B); C is described below.
 
 | | **A · Paper split** (Jack Roberts) | **B · Editorial collage** (Vox-style) |
 |---|---|---|
@@ -16,6 +16,15 @@ Preview sheets: `assets/target-look-scenes.jpg` (A) and `assets/style-b/target-l
 | **Cost** | no credits | ~15 Higgsfield images (1 credit each) + ~8 animations (45 credits each at 1080p) ≈ 380 credits |
 | **Best when** | the face source is good and the topic is software/UI | the topic is conceptual, or the face source is weak |
 | **Files** | `references/design-system.md`, `assets/reference-composition.html`, `references/judge-prompt.md` | `references/style-b/design-system.md`, `assets/style-b/reference-build.py`, `references/style-b/judge-prompt.md` |
+
+**C · Live product lift** — for a dedicated scripted take that promotes a live page of interactive demos (a component
+gallery, a showreel, a landing page). The speaker's cut-out in the lower half over bold colour fields (yellow / purple /
+teal / pink / green), the real demos captured from the site and lifted out of the 3D page as layers (always behind the
+speaker), charcoal caption pills with the spoken word lit, accent keyword chips, a HUD timecode, colour wipes, an official
+mascot or logo asset where the product has one, intro and outro stings, a bass-heavy 100 BPM bed under the voice.
+Cost: no generation credits (a music model may bill separately). Best when the topic *is* a website or UI. Files:
+`references/style-c/design-system.md` (look, lift technique, face rules), `references/style-c/pipeline.md` (the short
+path), `references/style-c/judge-prompt.md`, `assets/style-c/lift-rig.js`, `scripts/style-c/`.
 
 Ask also: the brand accent colour (B), and whether spending Higgsfield credits is OK (B). Report credits
 before and after every Higgsfield call — the user wants to see what each step cost and what is left.
