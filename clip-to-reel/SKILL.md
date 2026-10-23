@@ -1,6 +1,6 @@
 ---
 name: clip-to-reel
-description: Turns a spoken passage from ANY existing video (talking head, screen recording with a webcam bubble, selfie, podcast, lecture) into a finished vertical 9:16 explainer reel in one of two proven styles the user picks first: A "paper split" (warm-paper split screens, Apple-like UI mocks, heavy caption chips, full-screen keyword CTA card) or B "editorial collage" (animated paper-cut collages generated with Higgsfield, minimal white UI, face card, flat black chips, collage-sign CTA). Fast path: one question round, a ready template, parallel media work and one judge round, then a publishing gate that asks before posting anywhere (UTM-tagged links; YouTube Shorts point to the full video). Use it whenever the user gives a video plus a timecode range or a pasted transcript excerpt and wants a Reel / Short / TikTok ("make a reel from 16:20 to 16:54", "did we already make a reel from this?", "in the collage style"), or asks to publish a finished reel to their social networks.
+description: Turns a spoken passage from ANY existing video (talking head, webcam-bubble screen recording, podcast, lecture), or a dedicated scripted take, into a finished vertical 9:16 reel in one of three proven styles the user picks first. A "paper split" (paper split screens, Apple-like UI mocks, heavy caption chips, keyword CTA card), B "editorial collage" (animated Higgsfield paper-cut collages, minimal white UI, face card) or C "live product lift" (the speaker's cut-out over bold colour fields while the real demos of a live web page lift out of the 3D page, word-lit caption pills). Fast path with one question round with defaults, a ready template, one judge round, then a publishing gate before posting anywhere (UTM links; Shorts point to the full video). Use it whenever the user wants a Reel / Short / TikTok from a video, a timecode range, a pasted transcript or a new take promoting a page ("make a reel from 16:20 to 16:54", "a reel for the post with the live examples"), or asks to publish one.
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, Agent
 ---
 
@@ -24,18 +24,23 @@ Read `references/gotchas.md` before starting. Every item there cost a render or 
 with a large-v3-turbo model (set `WHISPER_MODEL`), Node + [HyperFrames](https://hyperframes.heygen.com) (`npx hyperframes`),
 and optionally `yt-dlp` for analysing a reference reel.
 
-## Two styles — the user picks one (step 0)
+## Three styles — the user picks one (step 0)
 
-Always start by showing `references/styles.md` (with the two preview sheets) and asking which style to use.
+Always start by showing `references/styles.md` (with the preview sheets) and asking which style to use.
 Then work only from that style's files:
 
-| | A · Paper split | B · Editorial collage |
-|---|---|---|
-| In one line | warm-paper split screens, Apple-like UI mocks, heavy grey chips, full-screen CTA card | animated paper-cut collages (Higgsfield) + minimal white UI, small face card, flat black chips, collage-sign CTA |
-| Design system | `references/design-system.md` | `references/style-b/design-system.md` |
-| Starting build | `assets/reference-composition.html` (via `setup_project.sh`) | `assets/style-b/reference-build.py` + `kit.css` (via `setup_project.sh … b`) |
-| Judge | `references/judge-prompt.md` | `references/style-b/judge-prompt.md` |
-| Credits | none | ≈250–320 Higgsfield credits (images ≈1, animations ≈58–60 each) — report the balance before and after |
+| | A · Paper split | B · Editorial collage | C · Live product lift |
+|---|---|---|---|
+| In one line | warm-paper split screens, Apple-like UI mocks, heavy grey chips, full-screen CTA card | animated paper-cut collages (Higgsfield) + minimal white UI, small face card, flat black chips, collage-sign CTA | speaker cut-out over bold colour fields; the real demos of a live page rise out of the 3D page; word-lit pills |
+| Source | a passage of a long video | a passage of a long video | a dedicated scripted take + a live page of demos |
+| Design system | `references/design-system.md` | `references/style-b/design-system.md` | `references/style-c/design-system.md` |
+| Starting build | `assets/reference-composition.html` (via `setup_project.sh`) | `assets/style-b/reference-build.py` + `kit.css` (via `setup_project.sh … b`) | `assets/style-c/lift-rig.js` + `scripts/style-c/` |
+| Judge | `references/judge-prompt.md` | `references/style-b/judge-prompt.md` | `references/style-c/judge-prompt.md` |
+| Credits | none | ≈250–320 Higgsfield credits (images ≈1, animations ≈58–60 each) — report the balance before and after | none (a music model may bill separately) |
+
+**Style C has its own short path:** `references/style-c/pipeline.md` (intake with defaults, preflight, heavy jobs one at a
+time, word-anchored timing, stills gate, stems at assembly). Follow it instead of steps 1–7 below; the gates in step 5
+and the publishing gate in step 8 still apply.
 
 **Style A:** a beige paper top half with a concrete graphic and the face below; bright studio scenes; one dark
 beat ≤ 2 s; one framed web-video card with real-logo tiles; heavy grey 1–3-word chips; snap-zoom plus whoosh on
@@ -46,7 +51,11 @@ full-bleed animated vintage collages in the brand accent colour; collage backdro
 shots; a rounded face card (small for a webcam bubble, large and bottom-anchored for a sharp full-frame face);
 flat near-black chips; a collage sign with the keyword.
 
-In both, don't drift into other reel templates (persistent top banner, boxed corner PIP, dark scrims over footage,
+**Style C:** the speaker's matte cut-out in the lower half over flat colour fields that change per beat; the page captured
+once as tiles, each demo captured solo and lifted out of its slot as a 3D layer, always behind the speaker; charcoal
+caption pills with the spoken word lit; colour wipes and camera whips along the page; stings before and after.
+
+In all three, don't drift into other reel templates (persistent top banner, boxed corner PIP, dark scrims over footage,
 progress bar, long bottom subtitles, URL overlays). **Never show a face larger than ~1.2× its source pixels** —
 with a webcam-bubble source use style B's small card; an AI upscale of a small face adds no real detail.
 **One font family for all text** (the templates use Noto Sans; swap the subset for your script).
@@ -61,7 +70,7 @@ with a webcam-bubble source use style B's small card; an AI upscale of a small f
 | **CTA keyword + promise** | the word viewers comment and what they receive (e.g. "GUIDE" and "I'll send you the full guide"). |
 | **Brand logo** | a simple-icons slug or a supplied SVG/PNG. |
 | **Music** | a supplied or licensed track. Never leave the bed silent. |
-| **Style** | A or B — ask (step 0). A different reference reel → see "New reference". |
+| **Style** | A, B or C — ask (step 0). A different reference reel → see "New reference". |
 | **Brand accent colour** (B) | the user's brand colour. |
 | **Higgsfield OK?** (B) | confirm credits may be spent; report the balance before and after every call. |
 
@@ -87,9 +96,13 @@ Reel progress:
 ### 0 · Before building: check, then ask once
 1. **Already made?** Check the exports folder and any notes for a reel of the same passage; if one exists, say so
    and ask before building a second.
-2. **One question round** covering everything not already known: style A/B (show both preview sheets,
-   `assets/target-look-scenes.jpg` and `assets/style-b/target-look.jpg`), for B the OK to spend credits and the
-   brand colour, and the CTA keyword + promise. Don't ask one question per step.
+2. **One question round** covering everything not already known: style A/B/C (show the preview sheets,
+   `assets/target-look-scenes.jpg` and `assets/style-b/target-look.jpg`; C is described in `references/styles.md`),
+   for B the OK to spend credits and the brand colour, and the CTA keyword + promise. Pre-fill a default for every
+   question so the user only confirms; late notes are usually defaults nobody asked about. Don't ask one question per step.
+3. **Preflight** before any heavy job: the take/passage is complete at both ends (transcribe the first and last 2 s on
+   their own), every paid service answers a tiny test call, the whisper model loads, and, if publishing follows, the
+   browser bridge is connected.
 
 ### 1 · Map the passage (no guessing)
 - Words: `bash scripts/transcribe.sh` on the passage window only (cut the source to ~passage + 10 s first).
@@ -129,6 +142,10 @@ first 3 s); a CTA sign for the last 2.5 s.
   without motion; no letter-spaced English labels.
 - Late elements rise from opacity 0. RTL pills with an icon get ≥ 120 px padding on the icon side.
 - Slide-ins stay inside the frame; the face `<video>` carries `data-layout-allow-overflow` for its push-in.
+- Nothing covers the face: measure the chin in the source and keep `y + scale × chin ≤ caption_top − 26` for every
+  captioned pose; zooms grow upward.
+- Scene times come from word indices of the anchored words, not literal seconds; every untimed element starts at opacity 0.
+- Every SFX maps to something on screen; no glitch or impact sounds unless asked.
 
 ### 5 · Gates before every render
 ```bash
@@ -140,7 +157,7 @@ npx --yes hyperframes@<pinned> snapshot --at <one time per scene>         # then
 Contrast warnings on elements hidden under a full-bleed overlay are false positives; fix everything else.
 
 ### 6 · Render, loudnorm, judge once
-`npm run render`, confirm the new file's mtime and duration, then always finish with a two-pass
+`npm run render` (`--workers 2`, one heavy job at a time on a laptop), confirm the new file's mtime and duration, then always finish with a two-pass
 `loudnorm=I=-14:TP=-1:LRA=7:linear=true` (video `-c copy`) and check `silencedetect` for a dead head or tail.
 **One judge round by default:** a fresh subagent with the style's judge prompt and `judge_sheet.sh` sheets, told
 about the deliberate client decisions (face-card size, brand colour, one font, CTA). Apply its ranked fixes in one
@@ -162,8 +179,8 @@ parameters, publish network by network, verify each post live, and report the UR
 
 ## Evaluations
 
-`evals/evals.json` holds five realistic scenarios (bubble recording, full-frame talking head, new reference,
-style B, fast path + publishing gate) with expected behaviours. Rerun them after changing this skill.
+`evals/evals.json` holds six realistic scenarios (bubble recording, full-frame talking head, new reference,
+style B, fast path + publishing gate, style C live-demo take) with expected behaviours. Rerun them after changing this skill.
 
 ## New reference
 To copy a different creator's reel:

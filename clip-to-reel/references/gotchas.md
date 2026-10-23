@@ -111,3 +111,31 @@
   face `<video>` with `data-layout-allow-overflow`.
 - **Parallel sessions** may create reels with the same number prefix at the same time. List the folder before
   naming, and never touch another session's drafts or files.
+
+## Learned on a 45 s style-C build (live demo page, dedicated take)
+- **Check the take is complete before building.** The phone clipped the first word; the re-recorded line arrived after the
+  build and shifted everything after the join by +0.8 s. Transcribe the first and last 2 s on their own first.
+- **Author times from word indices, not literal seconds.** Literal times forced a one-off shift (timeline children past the
+  join, data attributes rewritten, a remap for the 3D rig). `W[i][0]` anchors turn a recut into one words-file regeneration.
+- **One heavy job at a time.** Captures + matte + renders in parallel crashed a laptop twice. Chain them, `nice`,
+  `render --workers 2`, ffmpeg `-threads 4`. A 45 s render is only ~2 min; captures and matting are the slow part.
+- **Mix audio at assembly, not in the composition.** Voice, music and SFX are stems; the sting splice and the final mix
+  happen in `assemble_stems.py`, so a new voice chain or music track re-runs about a minute of assembly, not five renders.
+- **An untimed element is always on screen.** A freeze-frame `<img>` added under the CTA video covered the whole reel;
+  give it opacity 0 and set it at its time.
+- **CDP screencast frames come in CSS pixels**, whatever the deviceScaleFactor. Make the demo big with a 2× viewport (solo
+  mode scales to fit) and keep frames ≤ ~1500 px wide or the frame rate falls to ~18 fps.
+- **`new URL(…, import.meta.url).pathname` keeps `%20`** — wrap it in `decodeURIComponent`, or files land in a `%20` folder.
+- **Sites with a strict CSP reject `addStyleTag`**; set styles on the elements (`el.style.setProperty(…, 'important')`).
+- **Whisper word times run 0.1–0.3 s early**; re-anchor the words of each RMS segment linearly (`anchor_words.py`). A long
+  shell loop of whisper runs exhausted the session twice: one call per step, or run it in the background.
+- **Glitch SFX read as noise** even on a glitch visual. Leave them out unless asked.
+- **The caption pill sat on the beard by 30–100 px** in every scene: measure the chin in lean-in frames and apply the face rule.
+- **zsh:** arrays are 1-indexed; `$th:r` / `$v:l` are modifiers (write `${th}`); `echo ====` is an error (`=cmd` expansion).
+- **A scripted edit with an empty `old` string** (a failed slice) inserts the new text between every character. Assert
+  `old` is non-empty and found exactly once.
+- **Music APIs fail late**: an expired key, then "credits depleted" even after a top-up. Test with one tiny call in step 0
+  and keep `synth_bed.py` ready.
+- **Voice chain order matters:** WPE dereverb after an uncapped DeepFilterNet measured best (echo tail −25 → −36 dB). The
+  de-esser only engaged after loudnorm; a 3-band split wasn't flat (2-band LR4 is).
+- **The account in the agent's context isn't necessarily the browser's account** — don't diagnose an extension problem from it.

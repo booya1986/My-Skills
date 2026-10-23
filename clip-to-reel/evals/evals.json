@@ -78,6 +78,24 @@
         "Asks whether to publish (multi-select of networks) and publishes nothing before an explicit yes",
         "On yes: shows the drafted texts for approval, tags every site link with UTM per network, keeps YouTube Shorts free of site links (related-video chip + pinned chapter comment), verifies each post live and reports URLs"
       ]
+    },
+    {
+      "id": 6,
+      "name": "style-c-live-demo-take",
+      "prompt": "I just filmed a 50 s take for my new post about my UI motion gallery (newest video in my downloads, script in SCRIPT.md). Make the reel with the gallery page in 3D and the demos lifting out, my face never covered, my intro and outro stings, keyword MOTION. Show me stills before you render.",
+      "files": [
+        "take.mp4",
+        "SCRIPT.md"
+      ],
+      "expected_behavior": [
+        "Picks style C and asks ONE intake round with its defaults pre-filled (CTA variants, intro at 1x after the hook, outro, music, stills gate) instead of discovering them as late notes",
+        "Preflight before heavy work: transcribes the first and last 2 s of the take alone and flags a clipped word; tests the music service with one tiny call",
+        "Runs captures, matte, voice models and renders one at a time (niced, render --workers 2), never in parallel",
+        "Captures demos with a CDP screencast at a 2x viewport (not recordVideo), page tiles with the demos hidden, and lifts each named demo from its slot on its spoken word using word-index timing",
+        "Every demo layer sits behind the cut-out; captions stay below the measured chin line on every captioned pose; no glitch or impact SFX",
+        "Sends named stills (one per script block, the lift, VO/half-behind marked) and a 20 s mix sample, and waits before rendering",
+        "Mixes voice, music and SFX at assembly, exports the CTA variants with sharp masters and 8 Mb/s upload files, and publishes nothing without an approval written by the user in its own conversation"
+      ]
     }
   ]
 }
